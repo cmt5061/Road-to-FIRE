@@ -587,9 +587,8 @@ textarea.full-inp{min-height:75px;resize:none;}
     align-items:start;
   }
 
-  /* left col: hero + milestones */
+  /* left col: hero only */
   #hero-card          {grid-column:1; grid-row:1;}
-  #milestones-wrap    {grid-column:1; grid-row:2;}
 
   /* right col: stats + assets + liabs + chart */
   #stats-row-wrap     {grid-column:2; grid-row:1;}
@@ -848,15 +847,6 @@ textarea.full-inp{min-height:75px;resize:none;}
       <canvas id="nw-chart" height="175"></canvas>
     </div>
 
-    <!-- Milestones -->
-    <div id="milestones-wrap">
-      <div class="sec-header" style="margin-top:4px">
-        <div class="sec-title">🌺 Road to Hana Journey</div>
-        <button class="sec-btn" onclick="openAddMilestone()">+ Add</button>
-      </div>
-      <div id="milestones-list"></div>
-    </div>
-
   </div>
 
   <!-- ═══════════════ HISTORY VIEW ═══════════════ -->
@@ -901,6 +891,17 @@ textarea.full-inp{min-height:75px;resize:none;}
         <p>No spend data yet.<br>Add annual data via the Monthly History tab.</p>
       </div>
     </div>
+  </div>
+
+  <!-- ═══════════════ ACHIEVEMENTS VIEW ═══════════════ -->
+  <div class="view" id="view-achievements">
+    <div style="font-family:var(--font-display);font-size:22px;margin-bottom:4px;">🌺 Road to Hana</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:18px;">Milestones unlock as your net worth grows. Configure each one to match a stop on the Road to Hana.</div>
+    <div class="sec-header">
+      <div class="sec-title">Journey Achievements</div>
+      <button class="sec-btn" onclick="openAddMilestone()">+ Add</button>
+    </div>
+    <div id="milestones-list"></div>
   </div>
 
   <!-- ═══════════════ ACCOUNTS VIEW ═══════════════ -->
@@ -1029,6 +1030,9 @@ textarea.full-inp{min-height:75px;resize:none;}
     </button>
     <button class="nav-item" onclick="switchView('history',this)">
       <span class="nav-icon">📅</span><span>History</span>
+    </button>
+    <button class="nav-item" onclick="switchView('achievements',this)">
+      <span class="nav-icon">🌺</span><span>Journey</span>
     </button>
     <button class="nav-item" onclick="switchView('accounts',this)">
       <span class="nav-icon">🏦</span><span>Accounts</span>
@@ -1509,8 +1513,14 @@ function switchView(name,btn){
   fab.style.display=(name==='dashboard'||name==='history')?'flex':'none';
   if(name==='dashboard')renderDash();
   if(name==='history'){renderHistory();if(historyTab==='trends')renderSpendTrends();if(historyTab==='summaries')renderSummaries();}
+  if(name==='achievements')renderAchievements();
   if(name==='accounts')renderAccounts();
   if(name==='settings')renderSettings();
+}
+
+function renderAchievements(){
+  const cur=Math.max(getCurrentNW(),0);
+  renderMilestones(cur);
 }
 
 function switchHistoryTab(tab){
@@ -1604,7 +1614,6 @@ function renderDash(){
   renderStats(sorted);
   renderAccCards(latest);
   renderChart();
-  renderMilestones(cur);
   checkMilestones(cur,latest);
 }
 
