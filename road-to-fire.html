@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Road to FIRE">
+<title>🔥 The Road to FIRE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+
+:root{
+  --bg:#08090d;
+  --surface:#101318;
+  --surface2:#181d24;
+  --surface3:#1e242e;
+  --border:#252c38;
+  --border2:#2e3845;
+  --text:#e8eaf0;
+  --text2:#7a8494;
+  --text3:#4a5568;
+  --gold:#c9922a;
+  --gold2:#e0ab3c;
+  --gold-glow:rgba(201,146,42,0.18);
+  --green:#2dbd72;
+  --green-dim:#1a7044;
+  --red:#e0473a;
+  --red-dim:#7a2520;
+  --blue:#4a8fe8;
+  --purple:#9b72cf;
+  --radius:14px;
+  --radius-sm:8px;
+  --safe-top:env(safe-area-inset-top);
+  --safe-bottom:env(safe-area-inset-bottom);
+  --font-display:'DM Serif Display',serif;
+  --font:'DM Sans',sans-serif;
+}
+
+html,body{
+  height:100%;background:var(--bg);color:var(--text);
+  font-family:var(--font);-webkit-overflow-scrolling:touch;overflow:hidden;
+}
+
+/* ── LAYOUT ── */
+#app{display:flex;flex-direction:column;height:100vh;height:-webkit-fill-available;}
+
+.view{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px 100px;display:none;}
+.view.active{display:block;}
+
+/* ── HEADER ── */
+.app-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:calc(12px + var(--safe-top)) 18px 10px;
+  background:var(--bg);border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.app-logo{display:flex;align-items:center;gap:8px;}
+.logo-flame{font-size:22px;line-height:1;}
+.logo-text{font-family:var(--font-display);font-size:17px;color:var(--gold2);letter-spacing:0.3px;}
+.header-date{font-size:11px;color:var(--text3);font-weight:500;}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{
+  display:flex;background:var(--surface);border-top:1px solid var(--border);
+  padding-bottom:calc(8px + var(--safe-bottom));flex-shrink:0;position:relative;z-index:50;
+}
+.nav-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  padding:10px 4px 4px;cursor:pointer;border:none;background:none;
+  color:var(--text3);font-size:10px;gap:3px;font-family:var(--font);font-weight:500;
+  transition:color 0.2s;
+}
+.nav-item.active{color:var(--gold2);}
+.nav-icon{font-size:20px;line-height:1;}
+
+/* ── HERO CARD ── */
+.hero-card{
+  background:linear-gradient(145deg,#0e1520 0%,#080c14 100%);
+  border:1px solid var(--border2);border-radius:var(--radius);
+  padding:22px;margin-bottom:14px;position:relative;overflow:hidden;
+}
+.hero-card::before{
+  content:'';position:absolute;top:-60px;right:-60px;
+  width:200px;height:200px;border-radius:50%;
+  background:radial-gradient(circle,rgba(201,146,42,0.07) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero-eyebrow{
+  font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:var(--gold);margin-bottom:6px;
+}
+.hero-amount{
+  font-family:var(--font-display);font-size:42px;line-height:1;
+  color:var(--text);margin-bottom:6px;
+}
+.hero-change{font-size:13px;color:var(--text2);}
+.hero-divider{height:1px;background:var(--border);margin:16px 0;}
+
+.progress-label{display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:7px;}
+.progress-track{height:6px;background:var(--surface3);border-radius:3px;overflow:hidden;}
+.progress-fill{
+  height:100%;border-radius:3px;
+  background:linear-gradient(90deg,var(--gold),var(--gold2));
+  transition:width 0.8s cubic-bezier(0.4,0,0.2,1);
+}
+.fire-est{font-size:11px;color:var(--text3);margin-top:7px;}
+
+/* ── STAT CARDS ── */
+.stats-scroll{
+  display:flex;gap:10px;overflow-x:auto;
+  -webkit-overflow-scrolling:touch;padding-bottom:2px;margin-bottom:14px;
+  scrollbar-width:none;
+}
+.stats-scroll::-webkit-scrollbar{display:none;}
+.stat-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:14px 16px;min-width:150px;flex-shrink:0;
+}
+.stat-label{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:8px;}
+.stat-value{font-family:var(--font-display);font-size:20px;line-height:1.1;}
+.stat-sub{font-size:11px;color:var(--text2);margin-top:4px;}
+
+/* ── SECTION HEADER ── */
+.sec-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.sec-title{font-size:13px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:var(--text2);}
+.sec-btn{font-size:13px;color:var(--gold2);background:none;border:none;font-family:var(--font);cursor:pointer;font-weight:600;}
+
+/* ── ACCOUNT CARDS ── */
+.acc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.acc-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:14px;
+}
+.acc-emoji{font-size:26px;display:block;margin-bottom:8px;}
+.acc-name{font-size:11px;color:var(--text2);font-weight:500;}
+.acc-bal{font-family:var(--font-display);font-size:18px;margin-top:2px;}
+.acc-card.liability .acc-bal{color:var(--red);}
+.liab-label{
+  font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--red);opacity:0.7;grid-column:1/-1;margin-top:4px;
+}
+
+/* ── CHART ── */
+.chart-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:16px;margin-bottom:14px;
+}
+.chart-toggles{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
+.ctoggle{
+  font-size:11px;font-weight:600;padding:5px 11px;border-radius:20px;
+  border:1px solid var(--border);background:none;color:var(--text3);
+  cursor:pointer;font-family:var(--font);transition:all 0.15s;
+}
+.ctoggle.active{background:var(--gold);color:#000;border-color:var(--gold);}
+
+/* ── MONTH ROWS ── */
+.month-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:14px;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);margin-bottom:8px;cursor:pointer;
+  transition:border-color 0.15s;
+}
+.month-row:active{border-color:var(--gold);opacity:0.8;}
+.mr-label{font-size:15px;font-weight:600;}
+.mr-net{font-size:12px;color:var(--text2);margin-top:2px;}
+.mr-right{text-align:right;}
+.mr-change{font-size:13px;font-weight:500;}
+.mr-note{font-size:10px;color:var(--text3);margin-top:2px;}
+.year-divider{
+  font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:var(--text3);padding:14px 0 6px;border-top:1px solid var(--border);margin-top:6px;
+}
+.year-divider:first-child{border-top:none;padding-top:0;}
+
+/* ── ANNUAL CARD ── */
+.annual-card{
+  background:var(--surface);border:1px solid var(--gold);border-radius:var(--radius);
+  margin-bottom:10px;overflow:hidden;
+}
+.annual-hdr{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:14px;cursor:pointer;
+}
+.annual-yr{font-family:var(--font-display);font-size:16px;color:var(--gold2);}
+.annual-sub{font-size:11px;color:var(--text2);margin-top:2px;}
+.annual-body{padding:0 14px 14px;display:none;border-top:1px solid var(--border);}
+.annual-body.open{display:block;}
+.arow{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.arow:last-child{border:none;}
+.arow-key{color:var(--text2);}
+.asec{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin:12px 0 6px;}
+
+/* ── MILESTONES ── */
+.milestone{
+  display:flex;align-items:center;gap:14px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:14px;margin-bottom:8px;
+}
+.milestone.hit{border-color:var(--gold);background:linear-gradient(90deg,rgba(201,146,42,0.05),transparent);}
+.ms-icon{font-size:28px;line-height:1;}
+.ms-info .ms-name{font-size:14px;font-weight:600;}
+.ms-info .ms-date{font-size:11px;color:var(--text2);margin-top:2px;}
+
+/* ── ACCOUNTS VIEW ── */
+.acc-row{
+  display:flex;justify-content:space-between;align-items:center;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:13px;margin-bottom:8px;
+}
+.ar-info{display:flex;align-items:center;gap:10px;}
+.ar-emoji{font-size:22px;}
+.ar-name{font-size:14px;font-weight:600;}
+.ar-type{font-size:11px;color:var(--text2);margin-top:1px;}
+.ar-archived{font-size:10px;color:var(--text3);font-style:italic;}
+.iBtn{background:none;border:none;font-size:18px;cursor:pointer;padding:4px 6px;opacity:0.7;}
+
+/* ── FAB ── */
+.fab{
+  position:fixed;bottom:calc(68px + var(--safe-bottom));right:18px;
+  width:58px;height:58px;border-radius:29px;
+  background:linear-gradient(145deg,var(--gold2),#b5791e);
+  border:none;font-size:28px;cursor:pointer;
+  box-shadow:0 4px 24px rgba(201,146,42,0.35);
+  display:flex;align-items:center;justify-content:center;z-index:100;
+  transition:transform 0.15s,box-shadow 0.15s;
+  font-family:var(--font);color:#000;font-weight:700;
+}
+.fab:active{transform:scale(0.93);box-shadow:0 2px 12px rgba(201,146,42,0.25);}
+
+/* ── MODALS ── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.75);
+  z-index:200;display:none;align-items:flex-end;justify-content:center;
+  backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
+}
+.modal-overlay.open{display:flex;}
+.modal{
+  background:var(--surface);border-radius:22px 22px 0 0;
+  border:1px solid var(--border2);border-bottom:none;
+  width:100%;max-width:620px;max-height:92vh;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:12px 18px 20px;padding-bottom:calc(20px + var(--safe-bottom));
+  animation:slideUp 0.28s cubic-bezier(0.32,0.72,0,1);
+}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.modal-pill{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 14px;}
+.modal-toprow{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.modal-title{font-family:var(--font-display);font-size:20px;}
+.modal-close{background:var(--surface2);border:none;color:var(--text2);font-size:14px;cursor:pointer;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-family:var(--font);}
+
+/* ── FORM ── */
+.fsec{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin:16px 0 8px;}
+.frow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);}
+.frow:last-child{border:none;}
+.frow label{font-size:14px;display:flex;align-items:center;gap:6px;color:var(--text);}
+.frow input[type="number"],.frow input[type="text"]{
+  background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);
+  color:var(--text);font-size:15px;padding:8px 10px;text-align:right;width:140px;
+  -webkit-appearance:none;font-family:var(--font);
+}
+.frow input:focus{outline:none;border-color:var(--gold);}
+.full-inp{
+  width:100%;background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);color:var(--text);font-size:14px;
+  padding:11px 13px;margin-bottom:9px;-webkit-appearance:none;font-family:var(--font);
+}
+.full-inp:focus{outline:none;border-color:var(--gold);}
+textarea.full-inp{min-height:75px;resize:none;}
+
+/* live NW box */
+.live-box{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:14px;margin:10px 0;text-align:center;
+}
+.live-lbl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);}
+.live-amt{font-family:var(--font-display);font-size:28px;margin-top:4px;}
+.live-breakdown{font-size:11px;color:var(--text3);margin-top:4px;}
+
+/* ── BUTTONS ── */
+.btn{
+  width:100%;padding:15px;border-radius:var(--radius);border:none;
+  font-size:15px;font-weight:700;cursor:pointer;margin-top:10px;
+  font-family:var(--font);letter-spacing:0.3px;transition:opacity 0.15s;
+}
+.btn:active{opacity:0.8;}
+.btn-primary{background:linear-gradient(135deg,var(--gold2),#b5791e);color:#000;}
+.btn-danger{background:var(--red-dim);color:var(--red);border:1px solid var(--red-dim);margin-top:8px;}
+.btn-ghost{background:var(--surface2);color:var(--text2);border:1px solid var(--border);margin-top:8px;}
+.btn-sm{
+  padding:7px 13px;border-radius:20px;border:1px solid var(--border);
+  background:var(--surface2);color:var(--text2);font-size:12px;
+  cursor:pointer;font-family:var(--font);font-weight:500;
+}
+
+/* ── SETTINGS ── */
+.srow{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:14px 0;border-bottom:1px solid var(--border);
+}
+.srow:last-child{border:none;}
+.srow-label{font-size:14px;}
+.srow input{
+  background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);
+  color:var(--text);font-size:14px;padding:8px 10px;width:130px;text-align:right;
+  font-family:var(--font);-webkit-appearance:none;
+}
+.srow input:focus{outline:none;border-color:var(--gold);}
+
+/* ── LINE ITEMS ── */
+.li-row{display:flex;gap:7px;margin-bottom:7px;align-items:center;}
+.li-row .full-inp{margin-bottom:0;flex:1;}
+.li-row .amt{width:115px;flex:none;}
+.rm-btn{background:none;border:none;color:var(--red);font-size:22px;cursor:pointer;flex-shrink:0;padding:0 4px;line-height:1;}
+.add-li{
+  width:100%;background:none;border:1px dashed var(--border2);border-radius:var(--radius-sm);
+  color:var(--text3);font-size:12px;padding:8px;cursor:pointer;margin-bottom:10px;font-family:var(--font);
+}
+
+/* ── SPEND SUMMARY BOX ── */
+.spend-box{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:12px 14px;margin:8px 0 12px;
+}
+.spend-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;}
+.spend-row:last-child{margin-bottom:0;}
+
+/* ── UTILS ── */
+.t-green{color:var(--green);}
+.t-red{color:var(--red);}
+.t-gold{color:var(--gold2);}
+.t-muted{color:var(--text2);}
+.empty{text-align:center;padding:40px 16px;color:var(--text3);}
+.empty-icon{font-size:44px;margin-bottom:12px;}
+.empty p{font-size:13px;line-height:1.6;}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;top:calc(70px + var(--safe-top));left:50%;transform:translateX(-50%);
+  background:var(--surface3);border:1px solid var(--border2);
+  color:var(--text);padding:9px 18px;border-radius:20px;font-size:13px;font-weight:500;
+  z-index:500;opacity:0;transition:opacity 0.25s;white-space:nowrap;pointer-events:none;
+}
+.toast.show{opacity:1;}
+
+/* ── CONFETTI ── */
+#confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:999;display:none;}
+
+/* ── MONTH SELECT ROW ── */
+.month-select-row{display:flex;gap:8px;margin-bottom:10px;}
+.month-select-row select,.month-select-row input{
+  background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);
+  color:var(--text);padding:10px 11px;font-size:14px;font-family:var(--font);
+  -webkit-appearance:none;
+}
+.month-select-row select{flex:1;}
+.month-select-row input{width:80px;}
+.month-select-row select:focus,.month-select-row input:focus{outline:none;border-color:var(--gold);}
+</style>
+</head>
+<body>
+<canvas id="confetti-canvas"></canvas>
+<div id="app">
+
+  <!-- HEADER -->
+  <div class="app-header">
+    <div class="app-logo">
+      <div class="logo-flame">🔥</div>
+      <div class="logo-text">The Road to FIRE</div>
+    </div>
+    <div class="header-date" id="header-date"></div>
+  </div>
+
+  <!-- ═══════════════ DASHBOARD VIEW ═══════════════ -->
+  <div class="view active" id="view-dashboard">
+
+    <div class="hero-card" id="hero-card">
+      <div class="hero-eyebrow">Net Worth</div>
+      <div class="hero-amount" id="hero-amount">$0</div>
+      <div class="hero-change" id="hero-change">—</div>
+      <div class="hero-divider"></div>
+      <div class="progress-label">
+        <span id="fire-lbl">Progress to FIRE</span>
+        <span id="fire-pct">0%</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+      <div class="fire-est" id="fire-est"></div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="stats-scroll" id="stats-row"></div>
+
+    <!-- Assets -->
+    <div class="sec-header"><div class="sec-title">Assets</div></div>
+    <div class="acc-grid" id="asset-cards"></div>
+
+    <!-- Liabilities -->
+    <div id="liab-section">
+      <div class="sec-header"><div class="sec-title" style="color:var(--red);opacity:0.8;">Liabilities</div></div>
+      <div class="acc-grid" id="liab-cards"></div>
+    </div>
+
+    <!-- Chart -->
+    <div class="chart-card" id="chart-card" style="display:none">
+      <div style="font-size:13px;font-weight:700;color:var(--text2);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:10px;">Net Worth Over Time</div>
+      <div class="chart-toggles">
+        <button class="ctoggle active" onclick="setChartMode('total',this)">Total</button>
+        <button class="ctoggle" onclick="setChartMode('accounts',this)">By Account</button>
+        <button class="ctoggle" onclick="setChartMode('liabilities',this)">w/ Liabilities</button>
+      </div>
+      <canvas id="nw-chart" height="175"></canvas>
+    </div>
+
+    <!-- Milestones -->
+    <div class="sec-header" style="margin-top:4px"><div class="sec-title">Journey Milestones</div></div>
+    <div id="milestones-list"></div>
+
+  </div>
+
+  <!-- ═══════════════ HISTORY VIEW ═══════════════ -->
+  <div class="view" id="view-history">
+    <div class="sec-header">
+      <div class="sec-title">History</div>
+      <button class="sec-btn" onclick="openAnnualModal(null)">+ Year Data</button>
+    </div>
+    <div id="history-list"></div>
+  </div>
+
+  <!-- ═══════════════ ACCOUNTS VIEW ═══════════════ -->
+  <div class="view" id="view-accounts">
+    <div class="sec-header">
+      <div class="sec-title">Asset Accounts</div>
+      <button class="sec-btn" onclick="openAddAccount('asset')">+ Add</button>
+    </div>
+    <div id="asset-acc-list"></div>
+    <div class="sec-header" style="margin-top:18px;">
+      <div class="sec-title" style="color:var(--red);opacity:0.8;">Liability Accounts</div>
+      <button class="sec-btn" onclick="openAddAccount('liability')">+ Add</button>
+    </div>
+    <div id="liab-acc-list"></div>
+  </div>
+
+  <!-- ═══════════════ SETTINGS VIEW ═══════════════ -->
+  <div class="view" id="view-settings">
+    <div style="font-family:var(--font-display);font-size:22px;margin-bottom:18px;">FIRE Settings</div>
+
+    <div class="srow">
+      <div class="srow-label">FIRE Number</div>
+      <input type="number" inputmode="decimal" id="s-fire" placeholder="2000000">
+    </div>
+    <div class="srow" style="flex-direction:column;align-items:flex-start;gap:8px;">
+      <div class="srow-label" style="font-size:13px;">Annual Expenses (for 25x rule)</div>
+      <div style="display:flex;gap:10px;align-items:center;width:100%;">
+        <input type="number" inputmode="decimal" id="s-expenses" placeholder="80000" style="width:130px;" oninput="updateCalcFire()">
+        <button class="btn-sm" id="btn-25x" onclick="toggle25x()">Use 25× Rule</button>
+        <span id="calc-fire" style="font-size:12px;color:var(--gold2);"></span>
+      </div>
+    </div>
+    <div class="srow">
+      <div class="srow-label">Expected Annual Return (%)</div>
+      <input type="number" inputmode="decimal" id="s-return" placeholder="7">
+    </div>
+    <div class="srow">
+      <div class="srow-label">Monthly Contribution ($)</div>
+      <input type="number" inputmode="decimal" id="s-contrib" placeholder="5000">
+    </div>
+
+    <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+
+    <div style="font-family:var(--font-display);font-size:20px;margin:28px 0 16px;">Data Management</div>
+
+    <button class="btn btn-ghost" onclick="exportJSON()">📤 Export Backup (JSON)</button>
+    <button class="btn btn-ghost" onclick="exportCSV()" style="margin-top:8px;">📊 Export to CSV</button>
+    <label class="btn btn-ghost" style="display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;margin-top:8px;">
+      📥 Import Backup (JSON)
+      <input type="file" accept=".json" style="display:none" onchange="importJSON(event)">
+    </label>
+    <button class="btn btn-danger" onclick="confirmReset()">🗑️ Reset All Data</button>
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" onclick="switchView('dashboard',this)">
+      <span class="nav-icon">📊</span><span>Dashboard</span>
+    </button>
+    <button class="nav-item" onclick="switchView('history',this)">
+      <span class="nav-icon">📅</span><span>History</span>
+    </button>
+    <button class="nav-item" onclick="switchView('accounts',this)">
+      <span class="nav-icon">🏦</span><span>Accounts</span>
+    </button>
+    <button class="nav-item" onclick="switchView('settings',this)">
+      <span class="nav-icon">⚙️</span><span>Settings</span>
+    </button>
+  </nav>
+</div>
+
+<!-- FAB -->
+<button class="fab" id="fab" onclick="openLogMonth()">+</button>
+<div class="toast" id="toast"></div>
+
+<!-- ══════════════════════════════════════
+     MODAL: LOG / EDIT MONTH
+═══════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-log">
+  <div class="modal">
+    <div class="modal-pill"></div>
+    <div class="modal-toprow">
+      <div class="modal-title" id="log-title">Log This Month</div>
+      <button class="modal-close" onclick="closeModal('modal-log')">✕</button>
+    </div>
+
+    <div class="month-select-row">
+      <select id="log-month">
+        <option value="1">January</option><option value="2">February</option>
+        <option value="3">March</option><option value="4">April</option>
+        <option value="5">May</option><option value="6">June</option>
+        <option value="7">July</option><option value="8">August</option>
+        <option value="9">September</option><option value="10">October</option>
+        <option value="11">November</option><option value="12">December</option>
+      </select>
+      <input type="number" inputmode="numeric" id="log-year" placeholder="2025" maxlength="4">
+    </div>
+
+    <div class="live-box">
+      <div class="live-lbl">Live Net Worth</div>
+      <div class="live-amt" id="live-amt">$0</div>
+      <div class="live-breakdown" id="live-breakdown">Assets: $0 — Liabilities: $0</div>
+    </div>
+
+    <div class="fsec">💰 Assets</div>
+    <div id="log-asset-fields"></div>
+
+    <div class="fsec">💳 Liabilities</div>
+    <div id="log-liab-fields"></div>
+
+    <div class="fsec">Additional Info</div>
+    <div class="frow">
+      <label>Monthly Income</label>
+      <input type="number" inputmode="decimal" id="log-income" placeholder="Optional">
+    </div>
+    <div style="margin-top:10px;">
+      <textarea class="full-inp" id="log-notes" placeholder="Notes — e.g. 'Received bonus', 'Market dip'"></textarea>
+    </div>
+
+    <input type="hidden" id="log-edit-id">
+    <button class="btn btn-primary" onclick="saveMonth()">Save Entry</button>
+    <button class="btn btn-danger" id="btn-del-month" onclick="deleteMonth()" style="display:none">Delete Entry</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MODAL: ADD / EDIT ACCOUNT
+═══════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-account">
+  <div class="modal">
+    <div class="modal-pill"></div>
+    <div class="modal-toprow">
+      <div class="modal-title" id="acc-modal-title">Add Account</div>
+      <button class="modal-close" onclick="closeModal('modal-account')">✕</button>
+    </div>
+    <input type="hidden" id="acc-type">
+    <input type="hidden" id="acc-edit-id">
+
+    <div style="display:flex;gap:10px;margin-bottom:10px;align-items:center;">
+      <input type="text" id="acc-emoji" class="full-inp" style="width:68px;text-align:center;font-size:26px;margin-bottom:0;padding:8px;" maxlength="2" placeholder="🏦">
+      <input type="text" id="acc-name" class="full-inp" style="margin-bottom:0;flex:1;" placeholder="Account name">
+    </div>
+
+    <button class="btn btn-primary" onclick="saveAccount()">Save Account</button>
+    <button class="btn btn-danger" id="btn-archive" onclick="archiveAccount()" style="display:none;">Archive Account</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MODAL: ANNUAL CONTEXT
+═══════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-annual">
+  <div class="modal">
+    <div class="modal-pill"></div>
+    <div class="modal-toprow">
+      <div class="modal-title" id="annual-title">Year in Review</div>
+      <button class="modal-close" onclick="closeModal('modal-annual')">✕</button>
+    </div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:14px;">All fields optional — reference only, no effect on AUM.</div>
+    <input type="hidden" id="annual-yr">
+
+    <!-- Year selector for new entries -->
+    <div id="annual-yr-picker" style="margin-bottom:12px;">
+      <input type="number" inputmode="numeric" id="annual-yr-input" class="full-inp" placeholder="Year (e.g. 2024)" style="margin-bottom:0;">
+    </div>
+
+    <div class="fsec">💼 Compensation</div>
+    <input type="number" inputmode="decimal" id="a-basecomp" class="full-inp" placeholder="Base Compensation (e.g. 200000)">
+
+    <div class="fsec">📊 Spending Overview</div>
+    <input type="number" inputmode="decimal" id="a-vacation" class="full-inp" placeholder="Vacation / Travel Spending">
+    <input type="number" inputmode="decimal" id="a-taxes" class="full-inp" placeholder="Taxes Paid">
+
+    <div class="fsec">🧾 Net Spend Tracker</div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:8px;">Enter credit card totals, rent, ATM withdrawals, etc. — purely for reference.</div>
+    <div id="ns-rows"></div>
+    <button class="add-li" onclick="addNSRow()">+ Add Spending Source</button>
+    <div class="spend-box" id="spend-box" style="display:none;">
+      <div class="spend-row">
+        <span class="t-muted">Total Net Spend</span>
+        <span id="ns-total" class="t-red" style="font-weight:600;"></span>
+      </div>
+      <div class="spend-row" id="ns-pct-row" style="display:none;">
+        <span class="t-muted">% of Income</span>
+        <span id="ns-pct" style="font-weight:600;"></span>
+      </div>
+      <div class="spend-row" id="ns-sav-row" style="display:none;">
+        <span class="t-muted">Implied Savings</span>
+        <span id="ns-sav" class="t-green" style="font-weight:600;"></span>
+      </div>
+    </div>
+
+    <div class="fsec">🛍️ Large Purchases</div>
+    <div id="lp-rows"></div>
+    <button class="add-li" onclick="addLPRow()">+ Add Large Purchase</button>
+
+    <div class="fsec">📝 Annual Notes</div>
+    <textarea class="full-inp" id="a-notes" placeholder="General notes for this year…"></textarea>
+
+    <button class="btn btn-primary" onclick="saveAnnual()">Save Year Data</button>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════
+// CONSTANTS & GLOBALS
+// ════════════════════════════════════════════════════════
+const MILESTONES=[10000,25000,50000,100000,250000,500000,1000000];
+const MS_LABELS=['$10K','$25K','$50K','$100K','$250K','$500K','$1M'];
+const MONTHS_SHORT=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const MONTHS_LONG=['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+let chartInst=null;
+let chartMode='total';
+
+// ════════════════════════════════════════════════════════
+// DATA MODEL & PERSISTENCE
+// ════════════════════════════════════════════════════════
+const DEFAULT_DB={
+  settings:{fireNumber:2000000,annualExpenses:80000,expectedReturn:7,monthlyContribution:5000,use25x:false},
+  accounts:[
+    {id:'savings',name:'Savings',emoji:'🏦',type:'asset',archived:false,order:0},
+    {id:'checking',name:'Checking',emoji:'💳',type:'asset',archived:false,order:1},
+    {id:'investments',name:'Investments',emoji:'📈',type:'asset',archived:false,order:2},
+    {id:'mortgage',name:'Mortgage',emoji:'🏠',type:'liability',archived:false,order:0},
+    {id:'auto',name:'Auto Loan',emoji:'🚗',type:'liability',archived:false,order:1},
+  ],
+  monthly:[],   // {id,year,month,balances:{},income,notes}
+  annual:[],    // {year,baseComp,vacationSpend,taxesPaid,notes,netSpendItems:[],largePurchases:[]}
+  milestones:[] // {amount,month,year}
+};
+
+let db=JSON.parse(JSON.stringify(DEFAULT_DB));
+
+function loadDB(){
+  try{
+    const s=localStorage.getItem('fire_v2');
+    if(s){const p=JSON.parse(s);db={...db,...p};}
+  }catch(e){}
+}
+
+function saveDB(){
+  try{localStorage.setItem('fire_v2',JSON.stringify(db));}catch(e){}
+}
+
+// ════════════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════════════
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
+
+function $fmt(n,abs=false){
+  if(n===null||n===undefined||isNaN(n))return'—';
+  const v=abs?Math.abs(n):n;
+  return'$'+Math.abs(v).toLocaleString('en-US',{maximumFractionDigits:0});
+}
+
+function fmtSigned(n){
+  if(n===null||n===undefined||isNaN(n))return'—';
+  return(n>=0?'+':'-')+'$'+Math.abs(n).toLocaleString('en-US',{maximumFractionDigits:0});
+}
+
+function fmtPct(n){
+  if(n===null||n===undefined||isNaN(n))return'';
+  return(n>=0?'+':'')+n.toFixed(1)+'%';
+}
+
+function netWorth(entry){
+  if(!entry)return{assets:0,liabs:0,net:0};
+  let a=0,l=0;
+  db.accounts.filter(x=>x.type==='asset').forEach(x=>{a+=parseFloat(entry.balances[x.id]||0);});
+  db.accounts.filter(x=>x.type==='liability').forEach(x=>{l+=parseFloat(entry.balances[x.id]||0);});
+  return{assets:a,liabs:l,net:a-l};
+}
+
+function sortedMonthly(){
+  return[...db.monthly].sort((a,b)=>a.year!==b.year?b.year-a.year:b.month-a.month);
+}
+
+function getEntry(year,month){return db.monthly.find(e=>e.year===year&&e.month===month);}
+
+function fireNumber(){return db.settings.use25x?db.settings.annualExpenses*25:db.settings.fireNumber;}
+
+function monthsToFire(curNW){
+  const target=fireNumber();
+  if(!target||curNW>=target)return null;
+  const r=db.settings.expectedReturn/100/12;
+  const pmt=db.settings.monthlyContribution||0;
+  let nw=curNW,m=0;
+  while(nw<target&&m<1200){nw=nw*(1+r)+pmt;m++;}
+  return m<1200?m:null;
+}
+
+// ════════════════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════════════════
+function switchView(name,btn){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  btn.classList.add('active');
+  const fab=document.getElementById('fab');
+  fab.style.display=(name==='dashboard'||name==='history')?'flex':'none';
+  if(name==='dashboard')renderDash();
+  if(name==='history')renderHistory();
+  if(name==='accounts')renderAccounts();
+  if(name==='settings')renderSettings();
+}
+
+// ════════════════════════════════════════════════════════
+// DASHBOARD
+// ════════════════════════════════════════════════════════
+function renderDash(){
+  const sorted=sortedMonthly();
+  const latest=sorted[0]||null;
+  const prev=sorted[1]||null;
+
+  // Hero net worth
+  const nw=latest?netWorth(latest):{net:0};
+  document.getElementById('hero-amount').textContent=$fmt(nw.net);
+
+  if(latest&&prev){
+    const pnw=netWorth(prev);
+    const diff=nw.net-pnw.net;
+    const pct=pnw.net!==0?(diff/Math.abs(pnw.net)*100):0;
+    document.getElementById('hero-change').innerHTML=
+      `<span class="${diff>=0?'t-green':'t-red'}">${fmtSigned(diff)} (${fmtPct(pct)})</span> <span class="t-muted">vs last month</span>`;
+  } else {
+    document.getElementById('hero-change').innerHTML='<span class="t-muted">No prior month to compare yet</span>';
+  }
+
+  // Progress bar
+  const fn=fireNumber();
+  const cur=Math.max(nw.net,0);
+  const pct=fn?Math.min(100,cur/fn*100):0;
+  document.getElementById('fire-pct').textContent=pct.toFixed(1)+'%';
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('fire-lbl').textContent=`To FIRE (${$fmt(cur)} / ${$fmt(fn)})`;
+
+  const mos=monthsToFire(cur);
+  if(mos!==null){
+    const now=new Date();
+    const fd=new Date(now.getFullYear(),now.getMonth()+mos);
+    document.getElementById('fire-est').textContent=
+      `Est. FIRE Date: ${MONTHS_LONG[fd.getMonth()]} ${fd.getFullYear()} (~${(mos/12).toFixed(1)} yrs)`;
+  } else if(cur>=fn&&fn>0){
+    document.getElementById('fire-est').innerHTML='<span class="t-gold">🎉 You\'ve reached your FIRE number!</span>';
+  } else {
+    document.getElementById('fire-est').textContent='Configure FIRE settings to see projection';
+  }
+
+  renderStats(sorted);
+  renderAccCards(latest);
+  renderChart();
+  renderMilestones(cur);
+  checkMilestones(cur,latest);
+}
+
+function renderStats(sorted){
+  const c=document.getElementById('stats-row');
+  const stats=[];
+  const latest=sorted[0];
+
+  if(sorted.length>=2){
+    const d=netWorth(latest).net-netWorth(sorted[1]).net;
+    const p=netWorth(sorted[1]).net!==0?d/Math.abs(netWorth(sorted[1]).net)*100:0;
+    stats.push({lbl:'Month-over-Month',val:fmtSigned(d),sub:fmtPct(p),cls:d>=0?'t-green':'t-red'});
+  }
+
+  if(latest){
+    let y=latest.year,m=latest.month-3;
+    if(m<=0){m+=12;y--;}
+    const qe=getEntry(y,m);
+    if(qe){
+      const d=netWorth(latest).net-netWorth(qe).net;
+      const p=netWorth(qe).net!==0?d/Math.abs(netWorth(qe).net)*100:0;
+      stats.push({lbl:'Quarter-over-Quarter',val:fmtSigned(d),sub:fmtPct(p),cls:d>=0?'t-green':'t-red'});
+    }
+    const ye=getEntry(latest.year-1,latest.month);
+    if(ye){
+      const d=netWorth(latest).net-netWorth(ye).net;
+      const p=netWorth(ye).net!==0?d/Math.abs(netWorth(ye).net)*100:0;
+      stats.push({lbl:'Year-over-Year',val:fmtSigned(d),sub:fmtPct(p),cls:d>=0?'t-green':'t-red'});
+    }
+  }
+
+  // Best single month gain
+  let best=null,bestD=-Infinity;
+  for(let i=1;i<sorted.length;i++){
+    const d=netWorth(sorted[i-1]).net-netWorth(sorted[i]).net;
+    if(d>bestD){bestD=d;best=sorted[i-1];}
+  }
+  if(best)stats.push({lbl:'Best Month',val:fmtSigned(bestD),sub:`${MONTHS_SHORT[best.month-1]} ${best.year}`,cls:'t-green'});
+
+  // Savings rate
+  const wi=sorted.find(e=>e.income&&e.income>0);
+  if(wi){
+    const idx=sorted.indexOf(wi);
+    if(idx+1<sorted.length){
+      const saved=netWorth(wi).net-netWorth(sorted[idx+1]).net;
+      const rate=(saved/wi.income*100);
+      stats.push({lbl:'Savings Rate',val:rate.toFixed(1)+'%',sub:`${MONTHS_SHORT[wi.month-1]} ${wi.year}`,cls:rate>=0?'t-green':'t-red'});
+    }
+  }
+
+  stats.push({lbl:'Months Logged',val:sorted.length,sub:'entries total',cls:'t-gold'});
+
+  c.innerHTML=stats.map(s=>`
+    <div class="stat-card">
+      <div class="stat-label">${s.lbl}</div>
+      <div class="stat-value ${s.cls}">${s.val}</div>
+      ${s.sub?`<div class="stat-sub">${s.sub}</div>`:''}
+    </div>`).join('');
+}
+
+function renderAccCards(latest){
+  const assets=db.accounts.filter(a=>a.type==='asset'&&!a.archived);
+  const liabs=db.accounts.filter(a=>a.type==='liability'&&!a.archived);
+
+  document.getElementById('asset-cards').innerHTML=assets.map(a=>{
+    const b=latest?parseFloat(latest.balances[a.id]||0):0;
+    return`<div class="acc-card"><span class="acc-emoji">${a.emoji}</span><div class="acc-name">${a.name}</div><div class="acc-bal">${$fmt(b)}</div></div>`;
+  }).join('');
+
+  const ls=document.getElementById('liab-section');
+  if(liabs.length===0){ls.style.display='none';return;}
+  ls.style.display='';
+  document.getElementById('liab-cards').innerHTML=liabs.map(a=>{
+    const b=latest?parseFloat(latest.balances[a.id]||0):0;
+    return`<div class="acc-card liability"><span class="acc-emoji">${a.emoji}</span><div class="acc-name">${a.name}</div><div class="acc-bal">${b>0?'-':''} ${$fmt(b)}</div></div>`;
+  }).join('');
+}
+
+function renderChart(){
+  const asc=[...db.monthly].sort((a,b)=>a.year!==b.year?a.year-b.year:a.month-b.month);
+  const cc=document.getElementById('chart-card');
+  if(asc.length<2){cc.style.display='none';return;}
+  cc.style.display='block';
+  const labels=asc.map(e=>`${MONTHS_SHORT[e.month-1]}'${String(e.year).slice(2)}`);
+  let datasets=[];
+  const palette=['#4a8fe8','#2dbd72','#9b72cf','#e0ab3c','#e0473a','#79c0ff','#f0e68c'];
+
+  if(chartMode==='total'){
+    datasets=[{label:'Net Worth',data:asc.map(e=>netWorth(e).net),borderColor:'#c9922a',backgroundColor:'rgba(201,146,42,0.08)',fill:true,tension:0.45,pointRadius:3,pointBackgroundColor:'#c9922a'}];
+  } else if(chartMode==='accounts'){
+    const as=db.accounts.filter(a=>a.type==='asset'&&!a.archived);
+    datasets=as.map((a,i)=>({label:`${a.emoji} ${a.name}`,data:asc.map(e=>parseFloat(e.balances[a.id]||0)),borderColor:palette[i%palette.length],backgroundColor:'transparent',tension:0.45,pointRadius:3}));
+  } else {
+    datasets=[
+      {label:'Net Worth',data:asc.map(e=>netWorth(e).net),borderColor:'#c9922a',backgroundColor:'transparent',tension:0.45,pointRadius:3},
+      ...db.accounts.filter(a=>a.type==='liability'&&!a.archived).map((a,i)=>({
+        label:`${a.emoji} ${a.name}`,
+        data:asc.map(e=>parseFloat(e.balances[a.id]||0)),
+        borderColor:'#e0473a',borderDash:[5,5],backgroundColor:'transparent',tension:0.45,pointRadius:3
+      }))
+    ];
+  }
+
+  const ctx=document.getElementById('nw-chart').getContext('2d');
+  if(chartInst)chartInst.destroy();
+  chartInst=new Chart(ctx,{
+    type:'line',data:{labels,datasets},
+    options:{
+      responsive:true,animation:{duration:400},
+      plugins:{legend:{labels:{color:'#7a8494',font:{size:11,family:'DM Sans'}}}},
+      scales:{
+        x:{ticks:{color:'#7a8494',font:{size:10}},grid:{color:'#1e242e'}},
+        y:{ticks:{color:'#7a8494',font:{size:10},callback:v=>v>=1000?'$'+(v/1000).toFixed(0)+'k':'$'+v},grid:{color:'#1e242e'}}
+      }
+    }
+  });
+}
+
+function setChartMode(mode,btn){
+  chartMode=mode;
+  document.querySelectorAll('.ctoggle').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderChart();
+}
+
+function renderMilestones(cur){
+  document.getElementById('milestones-list').innerHTML=MILESTONES.map((m,i)=>{
+    const hit=db.milestones.find(x=>x.amount===m);
+    return`<div class="milestone ${hit?'hit':''}">
+      <div class="ms-icon">${hit?'🏆':'🔒'}</div>
+      <div class="ms-info">
+        <div class="ms-name">${MS_LABELS[i]} Net Worth</div>
+        <div class="ms-date">${hit?`Achieved ${MONTHS_SHORT[hit.month-1]} ${hit.year}`:`${$fmt(Math.max(0,cur),true)} of ${$fmt(m,true)}`}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function checkMilestones(cur,latest){
+  let newHit=false;
+  MILESTONES.forEach(m=>{
+    if(!db.milestones.find(x=>x.amount===m)&&cur>=m){
+      db.milestones.push({amount:m,month:latest?latest.month:new Date().getMonth()+1,year:latest?latest.year:new Date().getFullYear()});
+      newHit=true;
+    }
+  });
+  if(newHit){saveDB();confetti();}
+}
+
+// ════════════════════════════════════════════════════════
+// HISTORY VIEW
+// ════════════════════════════════════════════════════════
+function renderHistory(){
+  const sorted=sortedMonthly();
+  const c=document.getElementById('history-list');
+  if(!sorted.length){
+    c.innerHTML=`<div class="empty"><div class="empty-icon">📅</div><p>No months logged yet.<br>Tap + to add your first entry.</p></div>`;
+    return;
+  }
+
+  const years=[...new Set(sorted.map(e=>e.year))].sort((a,b)=>b-a);
+  let html='';
+
+  years.forEach(year=>{
+    const entries=sorted.filter(e=>e.year===year);
+    const ann=db.annual.find(a=>a.year===year);
+    if(ann)html+=annualCard(ann);
+    html+=`<div class="year-divider">${year}</div>`;
+    entries.forEach(entry=>{
+      const nw=netWorth(entry);
+      const idx=sorted.indexOf(entry);
+      const prev2=sorted[idx+1];
+      const diff=prev2?nw.net-netWorth(prev2).net:null;
+      const pct=diff!==null&&netWorth(prev2).net!==0?diff/Math.abs(netWorth(prev2).net)*100:null;
+      html+=`<div class="month-row" onclick="openEditMonth('${entry.id}')">
+        <div>
+          <div class="mr-label">${MONTHS_LONG[entry.month-1]} ${entry.year}</div>
+          <div class="mr-net">${$fmt(nw.net)} net worth</div>
+        </div>
+        <div class="mr-right">
+          ${diff!==null?`<div class="mr-change ${diff>=0?'t-green':'t-red'}">${fmtSigned(diff)} ${pct!==null?'('+fmtPct(pct)+')':''}</div>`:'<div class="mr-change t-muted">First entry</div>'}
+          ${entry.notes?'<div class="mr-note">📝 note</div>':''}
+        </div>
+      </div>`;
+    });
+  });
+
+  c.innerHTML=html;
+}
+
+function annualCard(d){
+  const ns=d.netSpendItems||[];
+  const lp=d.largePurchases||[];
+  const totalNS=ns.reduce((s,i)=>s+(parseFloat(i.amount)||0),0);
+
+  let body='';
+  if(d.baseComp)body+=`<div class="arow"><span class="arow-key">Base Compensation</span><span class="t-gold">${$fmt(d.baseComp)}</span></div>`;
+  if(d.vacationSpend)body+=`<div class="arow"><span class="arow-key">Vacation / Travel</span><span>${$fmt(d.vacationSpend)}</span></div>`;
+  if(d.taxesPaid)body+=`<div class="arow"><span class="arow-key">Taxes Paid</span><span>${$fmt(d.taxesPaid)}</span></div>`;
+
+  if(ns.length){
+    body+=`<div class="asec">Net Spend</div>`;
+    ns.forEach(i=>body+=`<div class="arow"><span class="arow-key">${i.name||'—'}</span><span>${$fmt(i.amount)}</span></div>`);
+    body+=`<div class="arow" style="font-weight:600;"><span>Total Net Spend</span><span class="t-red">${$fmt(totalNS)}</span></div>`;
+    if(d.baseComp&&totalNS){
+      const pct=(totalNS/d.baseComp*100).toFixed(1);
+      const sav=d.baseComp-totalNS;
+      body+=`<div class="arow"><span class="arow-key">% of Income</span><span>${pct}%</span></div>`;
+      body+=`<div class="arow"><span class="arow-key">Implied Savings</span><span class="t-green">${$fmt(sav)} (${(sav/d.baseComp*100).toFixed(1)}%)</span></div>`;
+    }
+  }
+
+  if(lp.length){
+    body+=`<div class="asec">Large Purchases</div>`;
+    lp.forEach(i=>body+=`<div class="arow"><span class="arow-key">${i.name||'—'}</span><span>${$fmt(i.amount)}</span></div>`);
+  }
+
+  if(d.notes)body+=`<div style="font-size:12px;color:var(--text2);margin-top:8px;line-height:1.6;">${d.notes}</div>`;
+
+  return`<div class="annual-card">
+    <div class="annual-hdr" onclick="this.nextElementSibling.classList.toggle('open')">
+      <div>
+        <div class="annual-yr">📋 ${d.year} Year in Review</div>
+        <div class="annual-sub">${totalNS?'Net Spend: '+$fmt(totalNS):'Tap to expand'}</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="btn-sm" onclick="event.stopPropagation();openAnnualModal(${d.year})">Edit</button>
+        <span class="t-muted" style="font-size:12px;">▼</span>
+      </div>
+    </div>
+    <div class="annual-body">${body||'<div class="t-muted" style="font-size:13px;padding:8px 0;">No data entered yet.</div>'}</div>
+  </div>`;
+}
+
+// ════════════════════════════════════════════════════════
+// ACCOUNTS VIEW
+// ════════════════════════════════════════════════════════
+function renderAccounts(){
+  const assets=db.accounts.filter(a=>a.type==='asset');
+  const liabs=db.accounts.filter(a=>a.type==='liability');
+  const row=a=>`<div class="acc-row">
+    <div class="ar-info">
+      <div class="ar-emoji">${a.emoji}</div>
+      <div>
+        <div class="ar-name">${a.name}${a.archived?` <span class="ar-archived">(archived)</span>`:''}</div>
+        <div class="ar-type">${a.type==='asset'?'💰 Asset':'💳 Liability'}</div>
+      </div>
+    </div>
+    <button class="iBtn" onclick="openEditAccount('${a.id}')">✏️</button>
+  </div>`;
+  document.getElementById('asset-acc-list').innerHTML=assets.map(row).join('')||'<div class="t-muted" style="font-size:13px;padding:8px 0;">No asset accounts.</div>';
+  document.getElementById('liab-acc-list').innerHTML=liabs.map(row).join('')||'<div class="t-muted" style="font-size:13px;padding:8px 0;">No liability accounts.</div>';
+}
+
+// ════════════════════════════════════════════════════════
+// SETTINGS
+// ════════════════════════════════════════════════════════
+function renderSettings(){
+  document.getElementById('s-fire').value=db.settings.fireNumber||'';
+  document.getElementById('s-expenses').value=db.settings.annualExpenses||'';
+  document.getElementById('s-return').value=db.settings.expectedReturn||7;
+  document.getElementById('s-contrib').value=db.settings.monthlyContribution||'';
+  updateCalcFire();
+  const b=document.getElementById('btn-25x');
+  b.textContent=db.settings.use25x?'✓ Using 25× Rule':'Use 25× Rule';
+  b.style.background=db.settings.use25x?'var(--gold)':'';
+  b.style.color=db.settings.use25x?'#000':'';
+}
+
+function updateCalcFire(){
+  const e=parseFloat(document.getElementById('s-expenses').value)||0;
+  document.getElementById('calc-fire').textContent=e?'= '+$fmt(e*25):'';
+}
+
+function toggle25x(){
+  db.settings.use25x=!db.settings.use25x;
+  saveDB();renderSettings();
+}
+
+function saveSettings(){
+  db.settings.fireNumber=parseFloat(document.getElementById('s-fire').value)||2000000;
+  db.settings.annualExpenses=parseFloat(document.getElementById('s-expenses').value)||80000;
+  db.settings.expectedReturn=parseFloat(document.getElementById('s-return').value)||7;
+  db.settings.monthlyContribution=parseFloat(document.getElementById('s-contrib').value)||0;
+  saveDB();toast('Settings saved!');renderDash();
+}
+
+// ════════════════════════════════════════════════════════
+// LOG MONTH MODAL
+// ════════════════════════════════════════════════════════
+function openLogMonth(){
+  const now=new Date();
+  document.getElementById('log-month').value=now.getMonth()+1;
+  document.getElementById('log-year').value=now.getFullYear();
+  document.getElementById('log-income').value='';
+  document.getElementById('log-notes').value='';
+  document.getElementById('log-edit-id').value='';
+  document.getElementById('btn-del-month').style.display='none';
+  document.getElementById('log-title').textContent='Log This Month';
+  buildLogFields({});
+  openModal('modal-log');
+}
+
+function openEditMonth(id){
+  const e=db.monthly.find(x=>x.id===id);
+  if(!e)return;
+  document.getElementById('log-month').value=e.month;
+  document.getElementById('log-year').value=e.year;
+  document.getElementById('log-income').value=e.income||'';
+  document.getElementById('log-notes').value=e.notes||'';
+  document.getElementById('log-edit-id').value=id;
+  document.getElementById('btn-del-month').style.display='block';
+  document.getElementById('log-title').textContent=`Edit ${MONTHS_LONG[e.month-1]} ${e.year}`;
+  buildLogFields(e.balances||{});
+  openModal('modal-log');
+}
+
+function buildLogFields(bals){
+  const assets=db.accounts.filter(a=>a.type==='asset'&&!a.archived);
+  const liabs=db.accounts.filter(a=>a.type==='liability'&&!a.archived);
+  const field=a=>`<div class="frow">
+    <label>${a.emoji} ${a.name}</label>
+    <input type="number" inputmode="decimal" id="bal-${a.id}" placeholder="0" value="${bals[a.id]||''}" oninput="updateLiveNW()">
+  </div>`;
+  document.getElementById('log-asset-fields').innerHTML=assets.map(field).join('');
+  document.getElementById('log-liab-fields').innerHTML=liabs.map(field).join('');
+  updateLiveNW();
+}
+
+function updateLiveNW(){
+  let a=0,l=0;
+  db.accounts.filter(x=>x.type==='asset'&&!x.archived).forEach(x=>{
+    const el=document.getElementById('bal-'+x.id);
+    if(el)a+=parseFloat(el.value||0);
+  });
+  db.accounts.filter(x=>x.type==='liability'&&!x.archived).forEach(x=>{
+    const el=document.getElementById('bal-'+x.id);
+    if(el)l+=parseFloat(el.value||0);
+  });
+  const net=a-l;
+  const el=document.getElementById('live-amt');
+  el.textContent=$fmt(net);
+  el.className='live-amt '+(net>=0?'t-green':'t-red');
+  document.getElementById('live-breakdown').textContent=`Assets: ${$fmt(a)} — Liabilities: ${$fmt(l)}`;
+}
+
+function saveMonth(){
+  const month=parseInt(document.getElementById('log-month').value);
+  const year=parseInt(document.getElementById('log-year').value);
+  if(!year||year<2000||year>2100){toast('Enter a valid year.');return;}
+  const income=parseFloat(document.getElementById('log-income').value)||null;
+  const notes=document.getElementById('log-notes').value.trim();
+  const editId=document.getElementById('log-edit-id').value;
+  const bals={};
+  db.accounts.filter(a=>!a.archived).forEach(a=>{
+    const el=document.getElementById('bal-'+a.id);
+    bals[a.id]=el?parseFloat(el.value||0):0;
+  });
+
+  if(editId){
+    const i=db.monthly.findIndex(e=>e.id===editId);
+    if(i>=0)db.monthly[i]={...db.monthly[i],month,year,balances:bals,income,notes};
+  } else {
+    const ex=getEntry(year,month);
+    if(ex){if(!confirm(`An entry for ${MONTHS_LONG[month-1]} ${year} already exists. Overwrite?`))return;
+      db.monthly=db.monthly.filter(e=>!(e.year===year&&e.month===month));}
+    db.monthly.push({id:uid(),year,month,balances:bals,income,notes});
+  }
+  saveDB();closeModal('modal-log');renderDash();toast('Entry saved! 🎉');
+}
+
+function deleteMonth(){
+  const id=document.getElementById('log-edit-id').value;
+  if(!id||!confirm('Delete this month\'s entry?'))return;
+  db.monthly=db.monthly.filter(e=>e.id!==id);
+  saveDB();closeModal('modal-log');renderDash();toast('Entry deleted.');
+}
+
+// ════════════════════════════════════════════════════════
+// ACCOUNT MODAL
+// ════════════════════════════════════════════════════════
+function openAddAccount(type){
+  document.getElementById('acc-type').value=type;
+  document.getElementById('acc-edit-id').value='';
+  document.getElementById('acc-name').value='';
+  document.getElementById('acc-emoji').value=type==='asset'?'🏦':'💳';
+  document.getElementById('acc-modal-title').textContent=`Add ${type==='asset'?'Asset':'Liability'} Account`;
+  document.getElementById('btn-archive').style.display='none';
+  openModal('modal-account');
+}
+
+function openEditAccount(id){
+  const a=db.accounts.find(x=>x.id===id);
+  if(!a)return;
+  document.getElementById('acc-type').value=a.type;
+  document.getElementById('acc-edit-id').value=id;
+  document.getElementById('acc-name').value=a.name;
+  document.getElementById('acc-emoji').value=a.emoji;
+  document.getElementById('acc-modal-title').textContent=`Edit ${a.name}`;
+  const btn=document.getElementById('btn-archive');
+  btn.style.display='block';
+  btn.textContent=a.archived?'✅ Restore Account':'📦 Archive Account';
+  openModal('modal-account');
+}
+
+function saveAccount(){
+  const name=document.getElementById('acc-name').value.trim();
+  const emoji=document.getElementById('acc-emoji').value.trim()||'🏦';
+  const type=document.getElementById('acc-type').value;
+  const editId=document.getElementById('acc-edit-id').value;
+  if(!name){toast('Enter an account name.');return;}
+  if(editId){
+    const i=db.accounts.findIndex(a=>a.id===editId);
+    if(i>=0){db.accounts[i].name=name;db.accounts[i].emoji=emoji;}
+  } else {
+    const maxOrd=Math.max(...db.accounts.filter(a=>a.type===type).map(a=>a.order),-1);
+    db.accounts.push({id:uid(),name,emoji,type,archived:false,order:maxOrd+1});
+  }
+  saveDB();closeModal('modal-account');renderAccounts();toast('Account saved!');
+}
+
+function archiveAccount(){
+  const id=document.getElementById('acc-edit-id').value;
+  const a=db.accounts.find(x=>x.id===id);
+  if(!a)return;
+  a.archived=!a.archived;
+  saveDB();closeModal('modal-account');renderAccounts();
+  toast(a.archived?'Account archived.':'Account restored.');
+}
+
+// ════════════════════════════════════════════════════════
+// ANNUAL MODAL
+// ════════════════════════════════════════════════════════
+function openAnnualModal(year){
+  const y=year||new Date().getFullYear();
+  const picker=document.getElementById('annual-yr-picker');
+  const inp=document.getElementById('annual-yr-input');
+
+  if(year){
+    picker.style.display='none';
+    document.getElementById('annual-yr').value=y;
+    document.getElementById('annual-title').textContent=`${y} Year in Review`;
+  } else {
+    picker.style.display='block';
+    inp.value=y;
+    document.getElementById('annual-title').textContent='Year in Review';
+    inp.addEventListener('input',()=>{
+      document.getElementById('annual-yr').value=inp.value;
+      document.getElementById('annual-title').textContent=`${inp.value} Year in Review`;
+    },{once:false});
+  }
+
+  document.getElementById('annual-yr').value=y;
+  const d=db.annual.find(a=>a.year===y)||{};
+  document.getElementById('a-basecomp').value=d.baseComp||'';
+  document.getElementById('a-vacation').value=d.vacationSpend||'';
+  document.getElementById('a-taxes').value=d.taxesPaid||'';
+  document.getElementById('a-notes').value=d.notes||'';
+
+  document.getElementById('ns-rows').innerHTML='';
+  (d.netSpendItems||[]).forEach(i=>addNSRow(i.name,i.amount));
+  if(!(d.netSpendItems||[]).length)addNSRow();
+
+  document.getElementById('lp-rows').innerHTML='';
+  (d.largePurchases||[]).forEach(i=>addLPRow(i.name,i.amount));
+  if(!(d.largePurchases||[]).length)addLPRow();
+
+  updateNSSummary();
+  openModal('modal-annual');
+}
+
+function addNSRow(name='',amount=''){
+  const r=document.createElement('div');
+  r.className='li-row';
+  r.innerHTML=`<input type="text" class="full-inp" style="margin-bottom:0;" placeholder="e.g. Chase Sapphire" value="${name}" oninput="updateNSSummary()">
+    <input type="number" inputmode="decimal" class="full-inp amt" style="margin-bottom:0;" placeholder="Amount" value="${amount}" oninput="updateNSSummary()">
+    <button class="rm-btn" onclick="this.parentElement.remove();updateNSSummary()">−</button>`;
+  document.getElementById('ns-rows').appendChild(r);
+}
+
+function addLPRow(name='',amount=''){
+  const r=document.createElement('div');
+  r.className='li-row';
+  r.innerHTML=`<input type="text" class="full-inp" style="margin-bottom:0;" placeholder="e.g. New car" value="${name}">
+    <input type="number" inputmode="decimal" class="full-inp amt" style="margin-bottom:0;" placeholder="Amount" value="${amount}">
+    <button class="rm-btn" onclick="this.parentElement.remove()">−</button>`;
+  document.getElementById('lp-rows').appendChild(r);
+}
+
+function updateNSSummary(){
+  let total=0;
+  document.querySelectorAll('#ns-rows .li-row').forEach(r=>{
+    total+=parseFloat(r.querySelectorAll('input')[1].value)||0;
+  });
+  const box=document.getElementById('spend-box');
+  box.style.display=total>0?'block':'none';
+  document.getElementById('ns-total').textContent=$fmt(total);
+  const base=parseFloat(document.getElementById('a-basecomp').value)||0;
+  const pr=document.getElementById('ns-pct-row');
+  const sr=document.getElementById('ns-sav-row');
+  if(base&&total){
+    pr.style.display='flex';sr.style.display='flex';
+    document.getElementById('ns-pct').textContent=(total/base*100).toFixed(1)+'% of income';
+    const sav=base-total;
+    document.getElementById('ns-sav').textContent=$fmt(sav)+' ('+(sav/base*100).toFixed(1)+'%)';
+  } else {pr.style.display='none';sr.style.display='none';}
+}
+
+function saveAnnual(){
+  let year=parseInt(document.getElementById('annual-yr').value||document.getElementById('annual-yr-input').value);
+  if(!year||year<2000||year>2100){toast('Enter a valid year.');return;}
+
+  const ns=[];
+  document.querySelectorAll('#ns-rows .li-row').forEach(r=>{
+    const ins=r.querySelectorAll('input');
+    const name=ins[0].value.trim();const amount=parseFloat(ins[1].value)||0;
+    if(name||amount)ns.push({name,amount});
+  });
+
+  const lp=[];
+  document.querySelectorAll('#lp-rows .li-row').forEach(r=>{
+    const ins=r.querySelectorAll('input');
+    const name=ins[0].value.trim();const amount=parseFloat(ins[1].value)||0;
+    if(name||amount)lp.push({name,amount});
+  });
+
+  const data={
+    year,
+    baseComp:parseFloat(document.getElementById('a-basecomp').value)||null,
+    vacationSpend:parseFloat(document.getElementById('a-vacation').value)||null,
+    taxesPaid:parseFloat(document.getElementById('a-taxes').value)||null,
+    notes:document.getElementById('a-notes').value.trim(),
+    netSpendItems:ns,largePurchases:lp
+  };
+
+  const i=db.annual.findIndex(a=>a.year===year);
+  if(i>=0)db.annual[i]=data;else db.annual.push(data);
+  saveDB();closeModal('modal-annual');renderHistory();toast(`${year} data saved!`);
+}
+
+// ════════════════════════════════════════════════════════
+// MODAL UTILS
+// ════════════════════════════════════════════════════════
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+document.querySelectorAll('.modal-overlay').forEach(o=>{
+  o.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
+});
+
+// ════════════════════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════════════════════
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ════════════════════════════════════════════════════════
+// CONFETTI
+// ════════════════════════════════════════════════════════
+function confetti(){
+  const cv=document.getElementById('confetti-canvas');
+  cv.style.display='block';cv.width=window.innerWidth;cv.height=window.innerHeight;
+  const ctx=cv.getContext('2d');
+  const cols=['#e0ab3c','#2dbd72','#4a8fe8','#9b72cf','#e0473a','#f0e68c'];
+  const parts=Array.from({length:100},()=>({
+    x:Math.random()*cv.width,y:-10,r:Math.random()*5+3,
+    vy:Math.random()*3+2,vx:(Math.random()-0.5)*2,
+    color:cols[Math.floor(Math.random()*cols.length)],rot:Math.random()*360,rv:(Math.random()-0.5)*8
+  }));
+  let raf;
+  function draw(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    let done=true;
+    parts.forEach(p=>{
+      if(p.y<cv.height+20){
+        done=false;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);
+        ctx.fillStyle=p.color;ctx.fillRect(-p.r/2,-p.r,p.r,p.r*2);ctx.restore();
+        p.y+=p.vy;p.x+=p.vx;p.rot+=p.rv;
+      }
+    });
+    if(!done)raf=requestAnimationFrame(draw);else cv.style.display='none';
+  }
+  draw();
+  setTimeout(()=>{cancelAnimationFrame(raf);cv.style.display='none';},5000);
+}
+
+// ════════════════════════════════════════════════════════
+// EXPORT / IMPORT / RESET
+// ════════════════════════════════════════════════════════
+function exportJSON(){
+  const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`road-to-fire-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();toast('JSON backup exported!');
+}
+
+function exportCSV(){
+  let csv='Year,Month,Total Assets,Total Liabilities,Net Worth,Income,Notes\n';
+  sortedMonthly().forEach(e=>{
+    const nw=netWorth(e);
+    csv+=`${e.year},${MONTHS_SHORT[e.month-1]},${nw.assets},${nw.liabs},${nw.net},${e.income||''},${(e.notes||'').replace(/,/g,';')}\n`;
+  });
+  csv+='\n\nAnnual Data\nYear,Base Comp,Vacation,Taxes,Net Spend,Notes\n';
+  db.annual.forEach(a=>{
+    const ns=(a.netSpendItems||[]).reduce((s,i)=>s+(parseFloat(i.amount)||0),0);
+    csv+=`${a.year},${a.baseComp||''},${a.vacationSpend||''},${a.taxesPaid||''},${ns||''},${(a.notes||'').replace(/,/g,';')}\n`;
+  });
+  const blob=new Blob([csv],{type:'text/csv'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`road-to-fire-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();toast('CSV exported!');
+}
+
+function importJSON(evt){
+  const f=evt.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const p=JSON.parse(e.target.result);
+      db={...DEFAULT_DB,...p};
+      saveDB();renderDash();
+      toast('Data imported successfully!');
+    }catch{toast('Import failed — invalid JSON file.');}
+  };
+  r.readAsText(f);evt.target.value='';
+}
+
+function confirmReset(){
+  if(confirm('⚠️ Permanently delete ALL data? This cannot be undone.')){
+    if(confirm('Last chance — are you sure?')){
+      localStorage.removeItem('fire_v2');location.reload();
+    }
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════
+function init(){
+  loadDB();
+  const now=new Date();
+  document.getElementById('header-date').textContent=
+    now.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  renderDash();
+  renderSettings();
+}
+
+document.getElementById('a-basecomp').addEventListener('input',updateNSSummary);
+document.getElementById('s-expenses').addEventListener('input',updateCalcFire);
+
+init();
+</script>
+</body>
+</html>
