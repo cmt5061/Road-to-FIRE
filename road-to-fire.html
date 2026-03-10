@@ -71,7 +71,8 @@ html,body{
 /* ── BOTTOM NAV ── */
 .bottom-nav{
   display:flex;background:var(--surface);border-top:1px solid var(--border);
-  padding-bottom:calc(8px + var(--safe-bottom));flex-shrink:0;position:relative;z-index:50;
+  padding-bottom:calc(8px + var(--safe-bottom));flex-shrink:0;
+  position:sticky;bottom:0;z-index:50;
 }
 .nav-item{
   flex:1;display:flex;flex-direction:column;align-items:center;
@@ -651,8 +652,8 @@ textarea.full-inp{min-height:75px;resize:none;}
 
 /* ── FIRE LADDER (multi-progress) ── */
 .fire-ladder{margin-top:14px;}
-.ladder-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
-.ladder-label{font-size:10px;font-weight:700;width:46px;flex-shrink:0;}
+.ladder-row{display:flex;align-items:center;gap:6px;margin-bottom:7px;}
+.ladder-label{font-size:10px;font-weight:700;width:72px;flex-shrink:0;white-space:nowrap;}
 .ladder-track{flex:1;height:5px;background:var(--surface3);border-radius:3px;overflow:hidden;}
 .ladder-fill{height:100%;border-radius:3px;transition:width 0.7s cubic-bezier(0.4,0,0.2,1);}
 .ladder-pct{font-size:10px;color:var(--text3);width:34px;text-align:right;flex-shrink:0;}
@@ -1007,7 +1008,7 @@ textarea.full-inp{min-height:75px;resize:none;}
   transition:transform 0.2s;display:inline-block;
 }
 .settings-section[open]>summary .ss-arrow{transform:rotate(90deg);}
-.settings-section>.ss-body{padding:14px 0 6px;}
+.settings-section>.ss-body{padding:14px 14px 6px;}
 /* existing SWR details — unify style */
 .settings-section details{margin:8px 0 0;}
 </style>
@@ -2881,7 +2882,7 @@ function renderFireTypeDetail(){
   const ladderRows=allT.map(t=>{
     const isThis=t.id===ft.id||(ft.id==='coast'&&t.id==='regular');
     return`<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
-      <div style="font-size:12px;width:60px;color:${isThis?t.color:'var(--text3)'};font-weight:${isThis?700:400};">${t.emoji} ${t.label}</div>
+      <div style="font-size:12px;width:76px;white-space:nowrap;color:${isThis?t.color:'var(--text3)'};font-weight:${isThis?700:400};">${t.emoji} ${t.label}</div>
       <div style="flex:1;height:4px;background:var(--surface3);border-radius:2px;overflow:hidden;">
         <div style="height:100%;background:${t.color};width:${Math.min(100,t.defaultExpenses/200000*100)}%;border-radius:2px;"></div>
       </div>
