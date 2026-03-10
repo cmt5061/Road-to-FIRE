@@ -84,6 +84,7 @@ html,body{
 
 /* ── HERO CARD ── */
 .hero-card{
+  position:relative;
   background:linear-gradient(145deg,#0a1a20 0%,#060d16 70%,#081510 100%);
   border:1px solid var(--border2);border-radius:var(--radius);
   padding:22px;margin-bottom:14px;position:relative;overflow:hidden;
@@ -107,7 +108,7 @@ html,body{
 }
 .hero-eyebrow{
   font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
-  color:var(--gold);margin-bottom:6px;
+  color:var(--gold);margin-bottom:2px;
 }
 .hero-amount{
   font-family:var(--font-display);font-size:42px;line-height:1;
@@ -956,15 +957,17 @@ textarea.full-inp{min-height:75px;resize:none;}
 
 /* ── AVATAR ── */
 .hero-avatar{
-  width:54px;height:54px;border-radius:50%;
+  width:48px;height:48px;border-radius:50%;
   border:2px solid rgba(201,146,42,0.5);
-  object-fit:cover;flex-shrink:0;cursor:pointer;
+  object-fit:cover;cursor:pointer;
   background:var(--surface2);
   display:flex;align-items:center;justify-content:center;
-  font-size:32px;line-height:1;overflow:hidden;
-  transition:border-color 0.2s;
+  font-size:28px;line-height:1;overflow:hidden;
+  transition:border-color 0.2s,transform 0.15s;
+  position:absolute;top:14px;right:14px;
+  flex-shrink:0;
 }
-.hero-avatar:active{border-color:var(--gold);}
+.hero-avatar:active{border-color:var(--gold);transform:scale(0.93);}
 .avatar-picker-grid{
   display:grid;grid-template-columns:repeat(5,1fr);gap:10px;
   margin:16px 0;
@@ -1028,12 +1031,10 @@ textarea.full-inp{min-height:75px;resize:none;}
 
     <div class="hero-card" id="hero-card">
       <div class="hero-wave"></div>
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <div class="hero-avatar" id="hero-avatar" onclick="openAvatarPicker()" title="Change avatar">🌺</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0;">
         <div class="hero-eyebrow" id="hero-eyebrow">Net Worth</div>
-        <div style="display:flex;gap:8px;align-items:center;">
-          <div id="fire-type-badge" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);background:rgba(201,146,42,0.12);border:1px solid rgba(201,146,42,0.25);padding:3px 9px;border-radius:10px;"></div>
-          <div class="hero-avatar" id="hero-avatar" onclick="openAvatarPicker()" title="Change avatar">🌺</div>
-        </div>
+        <div id="fire-type-badge" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);background:rgba(201,146,42,0.12);border:1px solid rgba(201,146,42,0.25);padding:3px 9px;border-radius:10px;"></div>
       </div>
       <div class="hero-amount" id="hero-amount">$0</div>
       <div id="hero-delta-wrap"></div>
@@ -1187,7 +1188,7 @@ textarea.full-inp{min-height:75px;resize:none;}
     <div style="margin:10px 0 16px;">
       <div class="srow-label" style="margin-bottom:8px;">Avatar</div>
       <div style="display:flex;align-items:center;gap:12px;">
-        <div class="hero-avatar" id="settings-avatar-preview" onclick="openAvatarPicker()" style="cursor:pointer;">🌺</div>
+        <div class="hero-avatar" id="settings-avatar-preview" onclick="openAvatarPicker()" style="cursor:pointer;position:relative;top:auto;right:auto;flex-shrink:0;">🌺</div>
         <div style="font-size:11px;color:var(--text3);line-height:1.5;">Tap to choose from<br>Hawaii-themed avatars<br>or upload your own</div>
       </div>
     </div>
@@ -1400,6 +1401,8 @@ textarea.full-inp{min-height:75px;resize:none;}
   <option value="Healthcare">
   <option value="Entertainment">
   <option value="Gym / Fitness">
+  <option value="Taxes">
+  <option value="ATM / Cash">
   <option value="Student Loans">
   <option value="Child Care">
   <option value="Pet Expenses">
@@ -1449,7 +1452,7 @@ textarea.full-inp{min-height:75px;resize:none;}
 <!-- ══════════════════════════════════════
      AVATAR PICKER MODAL
 ═══════════════════════════════════════ -->
-<div class="modal-overlay" id="modal-avatar" style="display:none;">
+<div class="modal-overlay" id="modal-avatar">
   <div class="modal" style="max-height:80vh;overflow-y:auto;">
     <div class="modal-pill"></div>
     <div class="modal-toprow">
@@ -1756,7 +1759,7 @@ const FIRE_TYPES=[
    desc:'Frugal but free. Budget lifestyle with minimal extras.',
    detail:'Think Van Life or house-hacking. No car payments, cheap rent, cooking at home. Works if you\'re flexible and resourceful.',
    defaultExpenses:40000},
-  {id:'regular',label:'Regular',emoji:'🔥', color:'#c9922a',
+  {id:'regular',label:'Regular',emoji:'🔥', color:'#e0603a',
    desc:'Comfortable middle ground. The classic FIRE target.',
    detail:'Decent apartment or mortgage, annual vacation, eating out occasionally. The most common FIRE goal in the community.',
    defaultExpenses:70000},
@@ -1764,7 +1767,7 @@ const FIRE_TYPES=[
    desc:'Generous lifestyle. Travel, hobbies, and real experiences.',
    detail:'Business class travel, restaurant dinners, home ownership with space. Meaningful splurges without guilt. No trade-offs required.',
    defaultExpenses:120000},
-  {id:'fat',   label:'Fat',    emoji:'🦁', color:'#e0ab3c',
+  {id:'fat',   label:'Fat',    emoji:'🦁', color:'#f0c030',
    desc:'Luxury, unconstrained. The highest FIRE target.',
    detail:'Multiple properties, private clubs, first class everything. Your portfolio is large enough that spending is never a consideration. Fat FIRE always requires the most capital.',
    defaultExpenses:200000},
@@ -3033,7 +3036,7 @@ function buildLogFields(bals){
   updateLiveNW();
 }
 
-const DEFAULT_EXPENSE_CATS=['Rent / Mortgage','Utilities','Groceries','Credit Cards','Insurance','Subscriptions'];
+const DEFAULT_EXPENSE_CATS=['Rent / Mortgage','Utilities','Groceries','Credit Cards','Insurance','Subscriptions','Taxes','ATM / Cash'];
 
 function buildExpenseFields(expenses){
   const wrap=document.getElementById('log-exp-fields');
@@ -3118,7 +3121,15 @@ function saveMonth(){
   }
   saveDB();
   recomputeMilestones();
-  closeModal('modal-log');renderDash();toast('Entry saved! 🎉');
+  closeModal('modal-log');
+  renderDash();
+  // Refresh whichever tab is currently visible
+  const activeView=document.querySelector('.view.active');
+  const activeId=activeView?activeView.id:'';
+  if(activeId==='view-history')renderHistory();
+  else if(activeId==='view-summaries')renderSummaries();
+  else if(activeId==='view-achievements')renderAchievements();
+  toast('Entry saved! 🎉');
 }
 
 function deleteMonth(){
@@ -5037,8 +5048,8 @@ function renderRBDResults(result,params){
         ctx.font='bold 10px DM Sans,sans-serif';
         ctx.fillStyle='#e0ab3c';
         ctx.textAlign='center';
-        ctx.textBaseline='bottom';
-        ctx.fillText('Age '+lifeExp,x,chartArea.top-2);
+        ctx.textBaseline='top';
+        ctx.fillText('Age '+lifeExp,x,chartArea.top+4);
         ctx.restore();
       }
     }]
@@ -5204,27 +5215,26 @@ function onInflationInput(){
 // AVATAR
 // ════════════════════════════════════════════════════════
 const AVATARS = [
-  // Each: {id, label, svg} — 20 Hawaii-themed cartoon characters
-  {id:'hula',     label:'Hula Dancer',   e:'\U0001f483'},
-  {id:'surfer',   label:'Surfer',         e:'\U0001f3c4'},
-  {id:'turtle',   label:'Sea Turtle',     e:'\U0001f422'},
-  {id:'dolphin',  label:'Dolphin',        e:'\U0001f42c'},
-  {id:'whale',    label:'Humpback Whale', e:'\U0001f433'},
-  {id:'pineapple',label:'Pineapple',      e:'\U0001f34d'},
-  {id:'hibiscus', label:'Hibiscus',       e:'\U0001f33a'},
-  {id:'palm',     label:'Palm Tree',      e:'\U0001f334'},
-  {id:'shaka',    label:'Shaka',          e:'\U0001f919'},
-  {id:'fish',     label:'Tropical Fish',  e:'\U0001f420'},
-  {id:'gecko',    label:'Gecko',          e:'\U0001f98e'},
-  {id:'snorkel',  label:'Snorkeler',      e:'\U0001f93f'},
-  {id:'volcano',  label:'Volcano',        e:'\U0001f30b'},
-  {id:'coconut',  label:'Coconut',        e:'\U0001f965'},
-  {id:'octopus',  label:'Octopus',        e:'\U0001f419'},
-  {id:'plumeria', label:'Plumeria',       e:'\U0001fab7'},
-  {id:'manta',    label:'Manta Ray',      e:'\U0001f988'},
-  {id:'parrot',   label:'Parrot',         e:'\U0001f99c'},
-  {id:'rainbow',  label:'Rainbow',        e:'\U0001f308'},
-  {id:'sunset',   label:'Sunset',         e:'\U0001f305'},
+  {id:'hula',     label:'Hula Dancer',    e:'💃'},
+  {id:'surfer',   label:'Surfer',          e:'🏄'},
+  {id:'turtle',   label:'Sea Turtle',      e:'🐢'},
+  {id:'dolphin',  label:'Dolphin',         e:'🐬'},
+  {id:'whale',    label:'Humpback Whale',  e:'🐳'},
+  {id:'pineapple',label:'Pineapple',       e:'🍍'},
+  {id:'hibiscus', label:'Hibiscus',        e:'🌺'},
+  {id:'palm',     label:'Palm Tree',       e:'🌴'},
+  {id:'shaka',    label:'Shaka',           e:'🤙'},
+  {id:'fish',     label:'Tropical Fish',   e:'🐠'},
+  {id:'gecko',    label:'Gecko',           e:'🦎'},
+  {id:'snorkel',  label:'Snorkeler',       e:'🤿'},
+  {id:'volcano',  label:'Volcano',         e:'🌋'},
+  {id:'coconut',  label:'Coconut',         e:'🥥'},
+  {id:'octopus',  label:'Octopus',         e:'🐙'},
+  {id:'plumeria', label:'Plumeria',        e:'🪷'},
+  {id:'shark',    label:'Shark',           e:'🦈'},
+  {id:'parrot',   label:'Parrot',          e:'🦜'},
+  {id:'rainbow',  label:'Rainbow',         e:'🌈'},
+  {id:'sunrise',  label:'Sunrise',         e:'🌅'},
 ];
 
 function getAvatarDisplay(settings){
@@ -5238,9 +5248,9 @@ function renderAvatarEl(el, settings){
   if(!el)return;
   const d=getAvatarDisplay(settings);
   if(d.type==='img'){
-    el.innerHTML=`<img src="${d.src}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    el.innerHTML='<img src="'+d.src+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
   } else {
-    el.textContent=d.e;
+    el.innerHTML='<span style="font-size:32px;line-height:1;">'+d.e+'</span>';
   }
 }
 
