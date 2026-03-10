@@ -1216,10 +1216,42 @@ textarea.full-inp{min-height:75px;resize:none;}
     </div>
 
     <div id="swr-display" class="swr-info" style="margin-top:8px;"></div>
+      </div>
+    </details>
+        
 
+    <!-- FIRE Type -->
+    <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin:18px 0 8px;">🔥 Your FIRE Goal</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:10px;">Select your lifestyle target. Each type has a default spending level you can override.</div>
+    <div class="fire-type-grid" id="fire-type-grid"></div>
+
+    <!-- FIRE Number -->
+    <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin:18px 0 8px;">🎯 FIRE Number</div>
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-bottom:12px;" id="preset-grid">
+      <button class="preset-btn" onclick="applyPreset(750000)">$750K</button>
+      <button class="preset-btn" onclick="applyPreset(1000000)">$1M</button>
+      <button class="preset-btn" onclick="applyPreset(1500000)">$1.5M</button>
+      <button class="preset-btn" onclick="applyPreset(2000000)">$2M</button>
+      <button class="preset-btn" onclick="applyPreset(2500000)">$2.5M</button>
+      <button class="preset-btn" onclick="applyPreset(3000000)">$3M</button>
+      <button class="preset-btn" onclick="applyPreset(4000000)">$4M</button>
+      <button class="preset-btn" onclick="applyPreset(5000000)">$5M</button>
+      <button class="preset-btn" onclick="applyPreset(7500000)">$7.5M</button>
+      <button class="preset-btn" onclick="applyPreset(10000000)">$10M</button>
+    </div>
+    <div class="srow">
+      <div>
+        <div class="srow-label">Annual Spending in Retirement</div>
+        <div id="auto-fire-calc" style="font-size:11px;color:var(--gold2);margin-top:2px;"></div>
+      </div>
+      <input type="number" inputmode="decimal" id="s-expenses" placeholder="80000" oninput="onExpensesInput()">
+    </div>
+
+
+    
     <!-- SWR explainer -->
-    <details style="margin:12px 0;">
-      <summary style="font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);list-style:none;display:flex;align-items:center;gap:6px;user-select:none;">📐 How the SWR is calculated <span style="color:var(--text3);font-size:10px;">▸ tap to expand</span></summary>
+    <details style="margin:12px 0;" ontoggle="this.querySelector('.swr-toggle-txt').textContent=this.open?'▾ collapse':'▸ expand'">
+      <summary style="font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);list-style:none;display:flex;align-items:center;justify-content:space-between;user-select:none;"><span>📐 How is SWR calculated?</span><span class="swr-toggle-txt" style="color:var(--text3);font-size:10px;">▸ expand</span></summary>
       <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:13px 15px;margin:12px 0;font-size:12px;line-height:1.7;color:var(--text2);">
       <div style="font-weight:700;color:var(--text);margin-bottom:5px;">📐 How the SWR is calculated</div>
       <div><strong>Safe Withdrawal Rate (SWR)</strong> is now derived from your actual retirement horizon: <em>Life Expectancy − Target Retirement Age</em>. This is more precise than age brackets — a 40-year-old retiring at 65 needs a shorter horizon SWR than one retiring at 40, even though they're the same age today.</div>
@@ -1230,46 +1262,7 @@ textarea.full-inp{min-height:75px;resize:none;}
     </div>
     </details>
 
-      </div>
-    </details>
-        <!-- FIRE Type -->
-    <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin:18px 0 8px;">🔥 Your FIRE Goal</div>
-    <div style="font-size:12px;color:var(--text3);margin-bottom:10px;">Select your lifestyle target. Each type has a default spending level you can override.</div>
-    <div class="fire-type-grid" id="fire-type-grid"></div>
     <div class="fire-type-detail" id="fire-type-detail"></div>
-
-    <!-- FIRE Number -->
-    <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin:18px 0 8px;">🎯 FIRE Number</div>
-    <div style="font-size:12px;color:var(--text3);margin-bottom:10px;">Quick presets — or enter your own number below.</div>
-    <div class="preset-grid" id="preset-grid">
-      <button class="preset-btn" onclick="applyPreset(1000000)">$1M</button>
-      <button class="preset-btn" onclick="applyPreset(1500000)">$1.5M</button>
-      <button class="preset-btn" onclick="applyPreset(2000000)">$2M</button>
-      <button class="preset-btn" onclick="applyPreset(2500000)">$2.5M</button>
-      <button class="preset-btn" onclick="applyPreset(3000000)">$3M</button>
-      <button class="preset-btn" onclick="applyPreset(4000000)">$4M</button>
-      <button class="preset-btn" onclick="applyPreset(5000000)">$5M</button>
-    </div>
-    <div class="srow">
-      <div class="srow-label">Custom FIRE Number</div>
-      <input type="number" inputmode="decimal" id="s-fire" placeholder="2000000">
-    </div>
-    <div class="srow">
-      <div>
-        <div class="srow-label">Annual Spending in Retirement</div>
-        <div id="auto-fire-calc" style="font-size:11px;color:var(--gold2);margin-top:2px;"></div>
-      </div>
-      <input type="number" inputmode="decimal" id="s-expenses" placeholder="80000" oninput="onExpensesInput()">
-    </div>
-    <div id="coast-fire-box" class="coast-box" style="display:none;">
-      <div class="coast-label">🌊 Coast FIRE Number</div>
-      <div class="coast-amount" id="coast-amount">—</div>
-      <div style="font-size:11px;color:var(--text2);margin-top:4px;" id="coast-desc"></div>
-    </div>
-    <div id="inflation-fire-box" class="coast-box" style="display:none;margin-top:8px;border-color:rgba(74,143,232,0.3);background:rgba(74,143,232,0.05);">
-      <div class="coast-label" style="color:var(--text2);">📊 Inflation-Adjusted FIRE Numbers</div>
-      <div id="inflation-fire-rows" style="margin-top:8px;font-size:12px;"></div>
-    </div>
 
     <!-- Projections -->
     <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin:18px 0 8px;">📈 Projection Inputs</div>
@@ -1756,6 +1749,10 @@ const HANA_POOL=[
 
 // ── FIRE TYPE DEFINITIONS ──────────────────────────────
 const FIRE_TYPES=[
+  {id:'coast', label:'Coast',  emoji:'🌊', color:'#2dbd72',
+   desc:'Stop contributing — let compound growth do the rest.',
+   detail:'You\'ve saved enough that even without adding another dollar, your portfolio will grow to your FIRE number by retirement age. Coast target is always lower than your full FIRE number because it\'s discounted for future growth.',
+   defaultExpenses:70000},
   {id:'lean',  label:'Lean',    emoji:'🌿', color:'#4a8fe8',
    desc:'Frugal but free. Budget lifestyle with minimal extras.',
    detail:'Think Van Life or house-hacking. No car payments, cheap rent, cooking at home. Works if you\'re flexible and resourceful.',
@@ -1772,10 +1769,6 @@ const FIRE_TYPES=[
    desc:'Luxury, unconstrained. The highest FIRE target.',
    detail:'Multiple properties, private clubs, first class everything. Your portfolio is large enough that spending is never a consideration. Fat FIRE always requires the most capital.',
    defaultExpenses:200000},
-  {id:'coast', label:'Coast',  emoji:'🌊', color:'#2dbd72',
-   desc:'Stop contributing — let compound growth do the rest.',
-   detail:'You\'ve saved enough that even without adding another dollar, your portfolio will grow to your FIRE number by retirement age. Coast target is always lower than your full FIRE number because it\'s discounted for future growth.',
-   defaultExpenses:70000},
 ];
 
 let chartInst=null;
@@ -1921,6 +1914,7 @@ function fireNumber(){
   if(ft==='coast')return coastFireTarget();
   const exp=db.settings.annualExpenses||70000;
   const swr=swrForType(ft)/100;
+  // Use stored fireNumber if explicitly set by a preset, else derive from expenses
   return db.settings.fireNumber||Math.round(exp/swr);
 }
 
@@ -2108,14 +2102,21 @@ function renderDash(){
     assumpEl.innerHTML='';velocityWrap.innerHTML='';
   }
 
-  // FIRE ladder — show all 4 non-coast types
+  // FIRE ladder — all 5 types including Coast
   const targets=allFireTargets();
+  const coastTarget=coastFireTarget();
+  const coastType=FIRE_TYPES.find(t=>t.id==='coast');
+  const coastP=Math.min(100,cur/coastTarget*100);
   const userFireType=db.settings.fireType||'regular';
-  const customFireNum=db.settings.fireNumber;
+  // Build all rows: Coast first, then Lean→Regular→Chubby→Fat
+  const allLadderTypes=[
+    {id:'coast',emoji:coastType.emoji,label:coastType.label,color:coastType.color,target:coastTarget},
+    ...targets
+  ];
   document.getElementById('fire-ladder').innerHTML=
     '<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);"><div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">ALL FIRE LEVELS</div>'
-    +targets.map(t=>{
-      const target=(t.id===userFireType&&customFireNum)?customFireNum:t.target;
+    +allLadderTypes.map(t=>{
+      const target=t.id==='coast'?coastTarget:(t.id===userFireType&&db.settings.fireNumber)?db.settings.fireNumber:t.target;
       const p=Math.min(100,cur/target*100);
       return`<div class="ladder-row">
         <div class="ladder-label" style="color:${t.color};">${t.emoji}${t.label}</div>
@@ -2833,7 +2834,13 @@ function renderSettings(){
   document.getElementById('s-birthyear').value=s.birthYear||'';
   document.getElementById('s-retage').value=s.retirementAge||50;
   document.getElementById('s-lifeexp').value=s.lifeExpectancy||90;
-  document.getElementById('s-fire').value=s.fireNumber||'';
+  // Highlight the matching preset button if fireNumber is set
+  if(s.fireNumber){
+    document.querySelectorAll('.preset-btn').forEach(b=>{
+      const amt=parseFloat(b.getAttribute('onclick').match(/[\d]+/)[0]);
+      b.classList.toggle('active', amt===s.fireNumber);
+    });
+  }
   document.getElementById('s-expenses').value=s.annualExpenses||'';
   document.getElementById('s-return').value=s.expectedReturn||7;
   document.getElementById('s-inflation').value=s.inflation||2.5;
@@ -2884,7 +2891,7 @@ function renderFireTypeDetail(){
     return`<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
       <div style="font-size:12px;width:76px;white-space:nowrap;color:${isThis?t.color:'var(--text3)'};font-weight:${isThis?700:400};">${t.emoji} ${t.label}</div>
       <div style="flex:1;height:4px;background:var(--surface3);border-radius:2px;overflow:hidden;">
-        <div style="height:100%;background:${t.color};width:${Math.min(100,t.defaultExpenses/200000*100)}%;border-radius:2px;"></div>
+        <div style="height:100%;background:${t.color};width:${Math.min(100,getCurrentNW()/t.target*100).toFixed(1)}%;border-radius:2px;"></div>
       </div>
       <div style="font-size:11px;color:${isThis?t.color:'var(--text3)'};width:54px;text-align:right;font-weight:${isThis?700:400};">${$fmt(Math.round(t.target/1000)*1000)}</div>
     </div>`;
@@ -2911,10 +2918,12 @@ function renderFireTypeDetail(){
 
 function selectFireType(id){
   db.settings.fireType=id;
+  db.settings.fireNumber=0;
   const ft=FIRE_TYPES.find(t=>t.id===id);
-  // Pre-fill default expenses if not already set
-  if(ft&&!document.getElementById('s-expenses').value){
+  if(ft&&ft.id!=='coast'){
+    db.settings.annualExpenses=ft.defaultExpenses; // update DB immediately so fireNumber() sees it
     document.getElementById('s-expenses').value=ft.defaultExpenses;
+    document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
   }
   renderFireTypePills();
   onExpensesInput();
@@ -2942,32 +2951,36 @@ function onExpensesInput(){
   if(exp){
     const implied=Math.round(exp/swr);
     document.getElementById('auto-fire-calc').textContent=`At ${(swr*100).toFixed(2)}% SWR → implied FIRE number: ${$fmt(implied)}`;
-    if(!document.getElementById('s-fire').value){
-      document.getElementById('s-fire').placeholder=implied;
-    }
+    // (no custom field — preset buttons handle FIRE number)
   } else {
     document.getElementById('auto-fire-calc').textContent='';
   }
-  // Coast FIRE box
-  const coastBox=document.getElementById('coast-fire-box');
-  if(ft==='coast'||(db.settings.birthYear&&db.settings.retirementAge)){
-    const c=coastFireTarget();
-    document.getElementById('coast-amount').textContent=$fmt(c);
-    const age=currentAge();
-    const retAge=db.settings.retirementAge||65;
-    document.getElementById('coast-desc').textContent=`If you stop contributing today and earn ${db.settings.expectedReturn||7}% annually, you'll hit your FIRE number by age ${retAge} in ${Math.max(0,retAge-age)} years.`;
-    coastBox.style.display='block';
-  } else {
-    coastBox.style.display='none';
-  }
+  // Coast info shown in fire-type-detail when Coast type is selected
   onInflationInput();
   renderFireTypeDetail();
 }
 
 function applyPreset(amount){
-  document.getElementById('s-fire').value=amount;
   document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
   event.target.classList.add('active');
+  // Derive implied spending from amount using current SWR, then pick best FIRE type
+  const swr=swrFromHorizon(retirementHorizon())/100;
+  const impliedSpend=Math.round(amount*swr);
+  // Thresholds: Lean <$55K, Regular $55K-$95K, Chubby $95K-$160K, Fat >$160K
+  let bestType='regular';
+  if(impliedSpend<55000) bestType='lean';
+  else if(impliedSpend<95000) bestType='regular';
+  else if(impliedSpend<160000) bestType='chubby';
+  else bestType='fat';
+  // Update settings + DB immediately
+  db.settings.fireType=bestType;
+  db.settings.annualExpenses=impliedSpend;
+  db.settings.fireNumber=amount;
+  document.getElementById('s-expenses').value=impliedSpend;
+  saveDB();
+  renderFireTypePills();
+  onExpensesInput();
+  renderDash();
 }
 
 function saveSettings(){
@@ -2976,7 +2989,14 @@ function saveSettings(){
   s.birthYear=parseInt(document.getElementById('s-birthyear').value)||null;
   s.retirementAge=parseInt(document.getElementById('s-retage').value)||65;
   s.lifeExpectancy=parseInt(document.getElementById('s-lifeexp').value)||90;
-  s.fireNumber=parseFloat(document.getElementById('s-fire').value)||2000000;
+  // fireNumber: use active preset if one is highlighted, else derive from expenses/SWR
+  const activePreset=document.querySelector('.preset-btn.active');
+  if(activePreset){
+    const m=activePreset.getAttribute('onclick').match(/applyPreset\((\d+)\)/);
+    s.fireNumber=m?parseInt(m[1]):0;
+  } else {
+    s.fireNumber=0; // derive from expenses/SWR in fireNumber()
+  }
   s.annualExpenses=parseFloat(document.getElementById('s-expenses').value)||70000;
   s.expectedReturn=parseFloat(document.getElementById('s-return').value)||7;
   s.inflation=parseFloat(document.getElementById('s-inflation').value)||2.5;
@@ -5183,32 +5203,8 @@ function onInflationInput(){
   if(nominal&&inf){
     el.style.display='block';
     el.innerHTML=`<strong>Real return: ${real.toFixed(2)}%</strong> (${nominal}% nominal − ${inf}% inflation, Fisher equation). Projections use nominal return; FIRE number shown in today's dollars.`;
-    // Show inflation-adjusted FIRE box if expenses set
-    const exp=parseFloat(document.getElementById('s-expenses').value)||0;
-    const retAge=parseInt(document.getElementById('s-retage').value)||65;
-    const age=currentAge();
-    const yearsToRetire=Math.max(0,retAge-age);
-    if(exp&&yearsToRetire>0){
-      const swr=swrForType(db.settings.fireType||'regular')/100;
-      const nomFireNum=db.settings.fireNumber||Math.round(exp/swr);
-      // Future value of expenses at retirement, adjusted for inflation
-      const futureExp=exp*Math.pow(1+inf/100,yearsToRetire);
-      const inflationAdjFIRE=Math.round(futureExp/swr);
-      const box=document.getElementById('inflation-fire-box');
-      const rows=document.getElementById('inflation-fire-rows');
-      box.style.display='block';
-      rows.innerHTML=`
-        <div class="ftd-row"><span>Today's spending target</span><strong>${$fmt(exp)}/yr</strong></div>
-        <div class="ftd-row"><span>Spending at retirement (age ${retAge}, ${inf}% inflation)</span><strong>${$fmt(Math.round(futureExp))}/yr</strong></div>
-        <div class="ftd-row"><span>Nominal FIRE number (today's $)</span><strong>${$fmt(nomFireNum)}</strong></div>
-        <div class="ftd-row"><span>Inflation-adjusted FIRE number (future $)</span><strong style="color:var(--gold2);">${$fmt(inflationAdjFIRE)}</strong></div>
-        <div style="font-size:11px;color:var(--text3);padding-top:6px;">Your savings goal in tomorrow's dollars. The gap above is the inflation premium over ${yearsToRetire} years.</div>`;
-    } else {
-      document.getElementById('inflation-fire-box').style.display='none';
-    }
   } else {
     el.style.display='none';
-    document.getElementById('inflation-fire-box').style.display='none';
   }
 }
 
