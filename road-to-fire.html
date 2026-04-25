@@ -864,10 +864,10 @@ textarea.full-inp{min-height:75px;resize:none;}
 .mexp-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
 .mexp-month-lbl{font-size:11px;color:var(--text2);width:52px;flex-shrink:0;text-align:right;}
 .mexp-bar-wrap{flex:1;height:22px;background:var(--surface2);border-radius:4px;overflow:hidden;position:relative;}
-.mexp-bar-fill{height:100%;border-radius:4px;background:rgba(224,71,58,0.6);transition:width 0.5s;}
+.mexp-bar-fill{height:100%;border-radius:4px;background:transparent;transition:width 0.5s;display:flex;overflow:hidden;}
 .mexp-bar-val{position:absolute;right:7px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:700;color:var(--text);}
 .mexp-cats{display:flex;flex-wrap:wrap;gap:5px;margin-top:3px;margin-left:62px;}
-.mexp-cat-chip{font-size:10px;padding:2px 7px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text3);}
+.mexp-cat-chip{font-size:10px;padding:2px 8px;border-radius:10px;color:#fff;font-weight:600;display:inline-block;}
 
 /* ── CHART TOOLTIP ── */
 .chart-tooltip{
@@ -1085,6 +1085,12 @@ textarea.full-inp{min-height:75px;resize:none;}
         <button class="ctoggle" onclick="setChartMode('accounts',this)">By Account</button>
         <button class="ctoggle" onclick="setChartMode('liabilities',this)">w/ Liabilities</button>
         <button class="ctoggle" onclick="setChartMode('forecast',this)">Forecast</button>
+      </div>
+      <div class="chart-toggles" style="margin-top:6px;">
+        <button class="ctoggle crange active" onclick="setChartRange('all',this)">All</button>
+        <button class="ctoggle crange" onclick="setChartRange('ytd',this)">YTD</button>
+        <button class="ctoggle crange" onclick="setChartRange('1y',this)">1Y</button>
+        <button class="ctoggle crange" onclick="setChartRange('2y',this)">2Y</button>
       </div>
       <div class="proj-legend" id="proj-legend" style="display:none;"></div>
       <div class="chart-card-inner">
@@ -1779,6 +1785,7 @@ const FIRE_TYPES=[
 let chartInst=null;
 let spendChartInst=null;
 let chartMode='total';
+let chartRange='all';
 let selectedPoolId=null;
 let historyTab='monthly';
 
@@ -2336,7 +2343,21 @@ function renderAccCards(latest){
 
 function renderChart(){
   if(typeof Chart==='undefined'){return;}
-  const asc=[...db.monthly].sort((a,b)=>a.year!==b.year?a.year-b.year:a.month-b.month);
+  let asc=[...db.monthly].sort((a,b)=>a.year!==b.year?a.year-b.year:a.month-b.month);
+  // Apply range filter
+  if(chartRange!=='all'&&asc.length>0){
+    const now=new Date();
+    let cutYear=now.getFullYear(), cutMonth=now.getMonth()+1;
+    if(chartRange==='ytd'){
+      cutYear=now.getFullYear(); cutMonth=1;
+    } else if(chartRange==='1y'){
+      cutYear=now.getFullYear()-1; cutMonth=now.getMonth()+1;
+    } else if(chartRange==='2y'){
+      cutYear=now.getFullYear()-2; cutMonth=now.getMonth()+1;
+    }
+    asc=asc.filter(e=>e.year>cutYear||(e.year===cutYear&&e.month>=cutMonth));
+    if(asc.length<2) asc=[...db.monthly].sort((a,b)=>a.year!==b.year?a.year-b.year:a.month-b.month); // fallback to all
+  }
   const cc=document.getElementById('chart-card');
   const legendEl=document.getElementById('proj-legend');
   if(asc.length<2){cc.style.display='none';return;}
@@ -2501,7 +2522,14 @@ function renderChart(){
 
 function setChartMode(mode,btn){
   chartMode=mode;
-  document.querySelectorAll('.ctoggle').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.ctoggle:not(.crange)').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderChart();
+}
+
+function setChartRange(range,btn){
+  chartRange=range;
+  document.querySelectorAll('.crange').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   renderChart();
 }
@@ -3070,6 +3098,37 @@ function buildLogFields(bals){
 }
 
 const DEFAULT_EXPENSE_CATS=['Rent / Mortgage','Utilities','Groceries','Credit Cards','Insurance','Subscriptions','Taxes','ATM / Cash'];
+
+// Fixed color per expense category — consistent across all months
+const EXPENSE_COLORS={
+  'Rent / Mortgage':  '#4a8fe8',
+  'HOA':              '#3a7bd5',
+  'Mortgage':         '#4a8fe8',
+  'Utilities':        '#2dbd72',
+  'Internet / Phone': '#22a898',
+  'Groceries':        '#f0c030',
+  'Dining Out':       '#e0ab3c',
+  'Credit Cards':     '#e0603a',
+  'Insurance':        '#9b72cf',
+  'Subscriptions':    '#79c0ff',
+  'Taxes':            '#e0473a',
+  'ATM / Cash':       '#a8d8ea',
+  'Transportation':   '#6ec6a0',
+  'Healthcare':       '#f08080',
+  'Entertainment':    '#c9922a',
+  'Gym / Fitness':    '#7ec8a0',
+  'Student Loans':    '#b07ab0',
+  'Child Care':       '#ffb347',
+  'Pet Expenses':     '#c8a87a',
+};
+
+function expenseColor(name){
+  if(EXPENSE_COLORS[name]) return EXPENSE_COLORS[name];
+  // Deterministic color from name hash
+  let h=0; for(let i=0;i<name.length;i++) h=(h*31+name.charCodeAt(i))&0xffffffff;
+  const palette=['#4a8fe8','#2dbd72','#9b72cf','#e0603a','#f0c030','#22a898','#79c0ff','#e0ab3c','#f08080','#6ec6a0'];
+  return palette[Math.abs(h)%palette.length];
+}
 
 function buildExpenseFields(expenses){
   const wrap=document.getElementById('log-exp-fields');
@@ -4652,8 +4711,8 @@ function renderMonthlyExpenses(){
   const best=runs.reduce((a,b)=>b.length>a.length?b:a,[]);
   if(best.length<3){el.innerHTML='';return;}
 
-  // Show most recent 13 from best run (13 months for full YoY comparison on every bar)
-  const show=best.slice(-13);
+  // Show most recent 13 from best run, reversed so most recent is at top
+  const show=best.slice(-13).reverse();
 
   const totals=show.map(e=>e.expenses.reduce((s,x)=>s+(parseFloat(x.amount)||0),0));
   const maxTotal=Math.max(...totals);
@@ -4708,16 +4767,27 @@ function renderMonthlyExpenses(){
       devHtml=`<span class="${devCls}" style="font-size:10px;font-weight:700;margin-left:4px;">${devSign}${devPct}%</span>`;
     }
 
-    // Top 3 expense categories
+    // Stacked bar segments + color-coded chips
     const expSorted=[...e.expenses].sort((a,b)=>(parseFloat(b.amount)||0)-(parseFloat(a.amount)||0));
-    const topCats=expSorted.slice(0,3).map(x=>`<span class="mexp-cat-chip">${x.name}: ${$fmt(parseFloat(x.amount)||0)}</span>`).join('');
+    // Build stacked segments (all categories, proportional widths)
+    const segments=expSorted.map(x=>{
+      const amt=parseFloat(x.amount)||0;
+      const segPct=total>0?(amt/total*100):0;
+      const col=expenseColor(x.name);
+      return `<div style="width:${segPct.toFixed(1)}%;background:${col};height:100%;"></div>`;
+    }).join('');
+    // Color-coded chips for top 3
+    const topCats=expSorted.slice(0,3).map(x=>{
+      const col=expenseColor(x.name);
+      return `<span class="mexp-cat-chip" style="background:${col}cc;border:1px solid ${col};">${x.name}: ${$fmt(parseFloat(x.amount)||0)}</span>`;
+    }).join('');
 
     html+=`<div style="margin-bottom:12px;">
       <div class="mexp-bar-row" style="margin-bottom:3px;">
         <div class="mexp-month-lbl">${monthLbl}</div>
         <div class="mexp-bar-wrap" style="position:relative;">
-          <div class="mexp-bar-fill" style="width:${pct}%"></div>
-          <div style="position:absolute;top:0;bottom:0;left:${avgPct}%;width:2px;background:var(--gold2);opacity:0.85;border-radius:1px;"></div>
+          <div class="mexp-bar-fill" style="width:${pct}%">${segments}</div>
+          <div style="position:absolute;top:0;bottom:0;left:${avgPct}%;width:2px;background:var(--gold2);opacity:0.85;border-radius:1px;z-index:2;"></div>
           <span class="mexp-bar-val">${$fmt(total)}${yoyHtml}${devHtml}</span>
         </div>
       </div>
