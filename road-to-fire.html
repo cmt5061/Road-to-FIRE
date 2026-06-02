@@ -1151,6 +1151,22 @@ textarea.full-inp{min-height:75px;resize:none;}
     </div>
   </div>
 
+  <!-- ── CATEGORY SPEND TRENDS ── -->
+  <div class="card" id="cat-trend-card" style="display:none;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <div class="card-title">📊 Category Spend Trends</div>
+      <div id="cat-trend-toggles" style="display:flex;flex-wrap:wrap;gap:5px;justify-content:flex-end;"></div>
+    </div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:10px;">Monthly spend per category over time · tap legend to toggle</div>
+    <div style="position:relative;">
+      <canvas id="cat-trend-chart" height="220"></canvas>
+    </div>
+    <div id="cat-trend-empty" class="empty" style="display:none;">
+      <div class="empty-icon">🏷️</div>
+      <p>Log monthly expenses to see category trends.</p>
+    </div>
+  </div>
+
   <!-- ═══════════════ ACHIEVEMENTS VIEW ═══════════════ -->
   <div class="view" id="view-achievements">
     <div style="font-family:var(--font-display);font-size:22px;margin-bottom:4px;" id="journey-title">🌺 Road to Hana</div>
@@ -1785,6 +1801,7 @@ const FIRE_TYPES=[
 
 let chartInst=null;
 let spendChartInst=null;
+let catTrendChartInst=null;
 let chartMode='total';
 let chartRange='all';
 let selectedPoolId=null;
@@ -1982,7 +1999,7 @@ function switchView(name,btn){
   const fab=document.getElementById('fab');
   fab.style.display=(name==='dashboard'||name==='history')?'flex':'none';
   if(name==='dashboard')renderDash();
-  if(name==='history'){renderHistory();if(historyTab==='trends')renderSpendTrends();if(historyTab==='summaries')renderSummaries();}
+  if(name==='history'){renderHistory();if(historyTab==='trends'){renderSpendTrends();renderCatTrendChart();}if(historyTab==='summaries')renderSummaries();}
   if(name==='achievements')renderAchievements();
   if(name==='accounts')renderAccounts();
   if(name==='settings')renderSettings();
@@ -2007,7 +2024,7 @@ function switchHistoryTab(tab){
     if(btn)btn.classList.toggle('active',t===tab);
     if(panel)panel.style.display=t===tab?'block':'none';
   });
-  if(tab==='trends')renderSpendTrends();
+  if(tab==='trends'){renderSpendTrends();renderCatTrendChart();}
   if(tab==='summaries')renderSummaries();
 }
 
@@ -3967,6 +3984,109 @@ function renderSpendTrends(){
 // ════════════════════════════════════════════════════════
 // THEME
 // ════════════════════════════════════════════════════════
+function renderCatTrendChart(){
+  if(typeof Chart==='undefined') return;
+  const card=document.getElementById('cat-trend-card');
+  const empty=document.getElementById('cat-trend-empty');
+  const ctx=document.getElementById('cat-trend-chart').getContext('2d');
+
+  // Need at least 3 months with expenses
+  const months=[...db.monthly]
+    .filter(e=>e.expenses&&e.expenses.length>0)
+    .sort((a,b)=>a.year!==b.year?a.year-b.year:a.month-b.month);
+
+  if(months.length<3){
+    card.style.display='none';
+    return;
+  }
+  card.style.display='block';
+  empty.style.display='none';
+
+  // Collect all unique categories across all months
+  const allCats=new Set();
+  months.forEach(m=>m.expenses.forEach(e=>{if(e.name)allCats.add(e.name);}));
+
+  // Pick top 6 categories by total spend to avoid clutter
+  const catTotals={};
+  allCats.forEach(cat=>{
+    catTotals[cat]=months.reduce((s,m)=>{
+      const ex=m.expenses.find(e=>e.name===cat);
+      return s+(ex?parseFloat(ex.amount)||0:0);
+    },0);
+  });
+  const topCats=Object.entries(catTotals)
+    .sort((a,b)=>b[1]-a[1])
+    .slice(0,7)
+    .map(([cat])=>cat);
+
+  const labels=months.map(m=>{
+    const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return mo[m.month-1]+' \'' +String(m.year).slice(2);
+  });
+
+  const datasets=topCats.map(cat=>{
+    const col=expenseColor(cat);
+    const data=months.map(m=>{
+      const ex=m.expenses.find(e=>e.name===cat);
+      return ex?parseFloat(ex.amount)||0:0;
+    });
+    return{
+      label:cat,
+      data,
+      borderColor:col,
+      backgroundColor:col+'33',
+      borderWidth:2,
+      pointRadius:3,
+      pointHoverRadius:5,
+      tension:0.35,
+      fill:false,
+    };
+  });
+
+  if(catTrendChartInst) catTrendChartInst.destroy();
+  catTrendChartInst=new Chart(ctx,{
+    type:'line',
+    data:{labels,datasets},
+    options:{
+      responsive:true,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{
+          display:true,
+          position:'bottom',
+          labels:{
+            color:'#c8d0dc',
+            font:{size:10},
+            boxWidth:10,
+            padding:10,
+            usePointStyle:true,
+          }
+        },
+        tooltip:{
+          callbacks:{
+            label:ctx=>`${ctx.dataset.label}: $${(ctx.parsed.y||0).toLocaleString()}`
+          }
+        }
+      },
+      scales:{
+        x:{
+          ticks:{color:'#7a8494',font:{size:9},maxRotation:45,maxTicksLimit:10},
+          grid:{color:'#1e242e'}
+        },
+        y:{
+          ticks:{
+            color:'#7a8494',
+            font:{size:10},
+            callback:v=>v>=1000?'$'+(v/1000).toFixed(1)+'k':'$'+v
+          },
+          grid:{color:'#1e242e'},
+          beginAtZero:true
+        }
+      }
+    }
+  });
+}
+
 function applyTheme(theme, save=true){
   document.documentElement.classList.toggle('light', theme==='light');
   if(save) localStorage.setItem('fire_theme', theme);
