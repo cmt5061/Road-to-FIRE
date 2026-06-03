@@ -1105,6 +1105,25 @@ textarea.full-inp{min-height:75px;resize:none;}
 
   </div>
 
+  
+
+
+    <!-- ── CATEGORY SPEND TRENDS ── -->
+  <div class="card" id="cat-trend-card" style="display:none;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <div class="card-title">📊 Category Spend Trends</div>
+      <div id="cat-trend-toggles" style="display:flex;flex-wrap:wrap;gap:5px;justify-content:flex-end;"></div>
+    </div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:10px;">Monthly spend per category over time · tap legend to toggle</div>
+    <div style="position:relative;">
+      <canvas id="cat-trend-chart" height="220"></canvas>
+    </div>
+    <div id="cat-trend-empty" class="empty" style="display:none;">
+      <div class="empty-icon">🏷️</div>
+      <p>Log monthly expenses to see category trends.</p>
+    </div>
+  </div>
+
   <!-- ═══════════════ HISTORY VIEW ═══════════════ -->
   <div class="view" id="view-history">
     <div class="subtabs">
@@ -1151,23 +1170,150 @@ textarea.full-inp{min-height:75px;resize:none;}
     </div>
   </div>
 
-  <!-- ── CATEGORY SPEND TRENDS ── -->
-  <div class="card" id="cat-trend-card" style="display:none;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-      <div class="card-title">📊 Category Spend Trends</div>
-      <div id="cat-trend-toggles" style="display:flex;flex-wrap:wrap;gap:5px;justify-content:flex-end;"></div>
+
+  <!-- ═══════════════ HISTORY VIEW ═══════════════ -->
+  <div class="view" id="view-history">
+    <div class="subtabs">
+      <button class="subtab active" id="subtab-monthly" onclick="switchHistoryTab('monthly')">📅 Monthly</button>
+      <button class="subtab" id="subtab-summaries" onclick="switchHistoryTab('summaries')">📈 Summaries</button>
+      <button class="subtab" id="subtab-trends" onclick="switchHistoryTab('trends')">💸 Spend</button>
     </div>
-    <div style="font-size:11px;color:var(--text3);margin-bottom:10px;">Monthly spend per category over time · tap legend to toggle</div>
-    <div style="position:relative;">
-      <canvas id="cat-trend-chart" height="220"></canvas>
+
+    <!-- Monthly History panel -->
+    <div id="panel-monthly">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+        <button class="sec-btn" onclick="openAnnualModal(null)">+ Year Data</button>
+      </div>
+      <div id="history-list"></div>
     </div>
-    <div id="cat-trend-empty" class="empty" style="display:none;">
-      <div class="empty-icon">🏷️</div>
-      <p>Log monthly expenses to see category trends.</p>
+
+    <!-- Summaries panel -->
+    <div id="panel-summaries" style="display:none;">
+      <div class="sum-toggle">
+        <button class="sum-tog-btn active" id="sum-yr-btn" onclick="switchSummaryMode('yearly')">📅 Yearly</button>
+        <button class="sum-tog-btn" id="sum-qtr-btn" onclick="switchSummaryMode('quarterly')">🗓️ Quarterly</button>
+      </div>
+      <div id="summary-content"></div>
+    </div>
+
+    <!-- Spend Trends panel -->
+    <div id="panel-trends" style="display:none;">
+      <!-- Monthly expense view -->
+      <div id="monthly-exp-section"></div>
+      <div class="trend-chart-card">
+        <div style="font-size:13px;font-weight:700;color:var(--text2);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:10px;">Annual Net Spend</div>
+        <div class="trend-legend">
+          <div class="tleg-item"><div class="tleg-dot" style="background:#e0473a;"></div> Net Spend</div>
+          <div class="tleg-item"><div class="tleg-dot" style="background:#c9922a;"></div> Base Comp</div>
+          <div class="tleg-item"><div class="tleg-dot" style="background:#2dbd72;"></div> Implied Savings</div>
+        </div>
+        <canvas id="spend-chart" height="200"></canvas>
+      </div>
+      <div id="spend-trend-rows"></div>
+      <div class="empty" id="spend-empty" style="display:none;">
+        <div class="empty-icon">📊</div>
+        <p>No spend data yet.<br>Add annual data via the Monthly History tab.</p>
+      </div>
     </div>
   </div>
 
-  <!-- ═══════════════ ACHIEVEMENTS VIEW ═══════════════ -->
+  
+
+
+  <!-- ═══════════════ HISTORY VIEW ═══════════════ -->
+  <div class="view" id="view-history">
+    <div class="subtabs">
+      <button class="subtab active" id="subtab-monthly" onclick="switchHistoryTab('monthly')">📅 Monthly</button>
+      <button class="subtab" id="subtab-summaries" onclick="switchHistoryTab('summaries')">📈 Summaries</button>
+      <button class="subtab" id="subtab-trends" onclick="switchHistoryTab('trends')">💸 Spend</button>
+    </div>
+
+    <!-- Monthly History panel -->
+    <div id="panel-monthly">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+        <button class="sec-btn" onclick="openAnnualModal(null)">+ Year Data</button>
+      </div>
+      <div id="history-list"></div>
+    </div>
+
+    <!-- Summaries panel -->
+    <div id="panel-summaries" style="display:none;">
+      <div class="sum-toggle">
+        <button class="sum-tog-btn active" id="sum-yr-btn" onclick="switchSummaryMode('yearly')">📅 Yearly</button>
+        <button class="sum-tog-btn" id="sum-qtr-btn" onclick="switchSummaryMode('quarterly')">🗓️ Quarterly</button>
+      </div>
+      <div id="summary-content"></div>
+    </div>
+
+    <!-- Spend Trends panel -->
+    <div id="panel-trends" style="display:none;">
+      <!-- Monthly expense view -->
+      <div id="monthly-exp-section"></div>
+      <div class="trend-chart-card">
+        <div style="font-size:13px;font-weight:700;color:var(--text2);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:10px;">Annual Net Spend</div>
+        <div class="trend-legend">
+          <div class="tleg-item"><div class="tleg-dot" style="background:#e0473a;"></div> Net Spend</div>
+          <div class="tleg-item"><div class="tleg-dot" style="background:#c9922a;"></div> Base Comp</div>
+          <div class="tleg-item"><div class="tleg-dot" style="background:#2dbd72;"></div> Implied Savings</div>
+        </div>
+        <canvas id="spend-chart" height="200"></canvas>
+      </div>
+      <div id="spend-trend-rows"></div>
+      <div class="empty" id="spend-empty" style="display:none;">
+        <div class="empty-icon">📊</div>
+        <p>No spend data yet.<br>Add annual data via the Monthly History tab.</p>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════ HISTORY VIEW ═══════════════ -->
+  <div class="view" id="view-history">
+    <div class="subtabs">
+      <button class="subtab active" id="subtab-monthly" onclick="switchHistoryTab('monthly')">📅 Monthly</button>
+      <button class="subtab" id="subtab-summaries" onclick="switchHistoryTab('summaries')">📈 Summaries</button>
+      <button class="subtab" id="subtab-trends" onclick="switchHistoryTab('trends')">💸 Spend</button>
+    </div>
+
+    <!-- Monthly History panel -->
+    <div id="panel-monthly">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+        <button class="sec-btn" onclick="openAnnualModal(null)">+ Year Data</button>
+      </div>
+      <div id="history-list"></div>
+    </div>
+
+    <!-- Summaries panel -->
+    <div id="panel-summaries" style="display:none;">
+      <div class="sum-toggle">
+        <button class="sum-tog-btn active" id="sum-yr-btn" onclick="switchSummaryMode('yearly')">📅 Yearly</button>
+        <button class="sum-tog-btn" id="sum-qtr-btn" onclick="switchSummaryMode('quarterly')">🗓️ Quarterly</button>
+      </div>
+      <div id="summary-content"></div>
+    </div>
+
+    <!-- Spend Trends panel -->
+    <div id="panel-trends" style="display:none;">
+      <!-- Monthly expense view -->
+      <div id="monthly-exp-section"></div>
+      <div class="trend-chart-card">
+        <div style="font-size:13px;font-weight:700;color:var(--text2);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:10px;">Annual Net Spend</div>
+        <div class="trend-legend">
+          <div class="tleg-item"><div class="tleg-dot" style="background:#e0473a;"></div> Net Spend</div>
+          <div class="tleg-item"><div class="tleg-dot" style="background:#c9922a;"></div> Base Comp</div>
+          <div class="tleg-item"><div class="tleg-dot" style="background:#2dbd72;"></div> Implied Savings</div>
+        </div>
+        <canvas id="spend-chart" height="200"></canvas>
+      </div>
+      <div id="spend-trend-rows"></div>
+      <div class="empty" id="spend-empty" style="display:none;">
+        <div class="empty-icon">📊</div>
+        <p>No spend data yet.<br>Add annual data via the Monthly History tab.</p>
+      </div>
+    </div>
+  </div>
+
+<!-- ═══════════════ ACHIEVEMENTS VIEW ═══════════════ -->
   <div class="view" id="view-achievements">
     <div style="font-family:var(--font-display);font-size:22px;margin-bottom:4px;" id="journey-title">🌺 Road to Hana</div>
     <div style="font-size:12px;color:var(--text3);margin-bottom:18px;">Milestones unlock as your net worth grows. Configure each one to match a stop on the Road to Hana.</div>
@@ -1999,7 +2145,7 @@ function switchView(name,btn){
   const fab=document.getElementById('fab');
   fab.style.display=(name==='dashboard'||name==='history')?'flex':'none';
   if(name==='dashboard')renderDash();
-  if(name==='history'){renderHistory();if(historyTab==='trends'){renderSpendTrends();renderCatTrendChart();}if(historyTab==='summaries')renderSummaries();}
+  if(name==='history'){renderHistory();if(historyTab==='trends')renderSpendTrends();if(historyTab==='summaries')renderSummaries();}
   if(name==='achievements')renderAchievements();
   if(name==='accounts')renderAccounts();
   if(name==='settings')renderSettings();
@@ -2024,7 +2170,7 @@ function switchHistoryTab(tab){
     if(btn)btn.classList.toggle('active',t===tab);
     if(panel)panel.style.display=t===tab?'block':'none';
   });
-  if(tab==='trends'){renderSpendTrends();renderCatTrendChart();}
+  if(tab==='trends')renderSpendTrends();
   if(tab==='summaries')renderSummaries();
 }
 
@@ -2899,6 +3045,7 @@ function renderSettings(){
   document.getElementById('s-contrib').value=s.monthlyContribution||'';
   renderFireTypePills();
   updateSWRDisplay();
+  renderCatTrendChart();
   onExpensesInput();
   // Sync theme pills
   const theme=localStorage.getItem('fire_theme')||'dark';
