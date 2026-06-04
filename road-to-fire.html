@@ -1103,13 +1103,8 @@ textarea.full-inp{min-height:75px;resize:none;}
       </div>
     </div>
 
-  </div>
-
-  
-
-
-    <!-- ── CATEGORY SPEND TRENDS ── -->
-  <div class="card" id="cat-trend-card" style="display:none;">
+  <!-- ── CATEGORY SPEND TRENDS ── -->
+  <div class="card" id="cat-trend-card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
       <div class="card-title">📊 Category Spend Trends</div>
       <div id="cat-trend-toggles" style="display:flex;flex-wrap:wrap;gap:5px;justify-content:flex-end;"></div>
@@ -1122,6 +1117,8 @@ textarea.full-inp{min-height:75px;resize:none;}
       <div class="empty-icon">🏷️</div>
       <p>Log monthly expenses to see category trends.</p>
     </div>
+  </div>
+
   </div>
 
   <!-- ═══════════════ HISTORY VIEW ═══════════════ -->
@@ -2524,8 +2521,11 @@ function renderChart(){
   }
   const cc=document.getElementById('chart-card');
   const legendEl=document.getElementById('proj-legend');
-  if(asc.length<2){cc.style.display='none';return;}
-  cc.style.display='block';
+  if(asc.length<2){
+    cc.style.display='block';
+    cc.innerHTML='<div class="card-title" style="margin-bottom:12px;">📈 Net Worth Over Time</div><div class="empty"><div class="empty-icon">📈</div><p>Log at least 2 months of data<br>to see your net worth chart.</p></div>';
+    return;
+  }
   legendEl.style.display=chartMode==='forecast'?'flex':'none';
   document.getElementById('forecast-caveat').style.display=chartMode==='forecast'?'block':'none';
 
@@ -4143,10 +4143,13 @@ function renderCatTrendChart(){
     .sort((a,b)=>a.year!==b.year?a.year-b.year:a.month-b.month);
 
   if(months.length<3){
-    card.style.display='none';
+    if(catTrendChartInst){catTrendChartInst.destroy();catTrendChartInst=null;}
+    document.getElementById('cat-trend-chart').style.display='none';
+    empty.style.display='block';
+    empty.innerHTML='<div class="empty-icon">📊</div><p>Log expenses for at least 3 months<br>to see category spend trends.</p>';
     return;
   }
-  card.style.display='block';
+  document.getElementById('cat-trend-chart').style.display='block';
   empty.style.display='none';
 
   // Collect all unique categories across all months
@@ -4967,7 +4970,10 @@ function renderMonthlyExpenses(){
     .filter(e=>e.expenses&&e.expenses.length>0)
     .sort((a,b)=>a.year!==b.year?a.year-b.year:a.month-b.month);
 
-  if(asc.length<3){el.innerHTML='';return;}
+  if(asc.length<3){
+    el.innerHTML='<div class="card"><div class="card-title" style="margin-bottom:12px;">🧾 Monthly Expenses</div><div class="empty"><div class="empty-icon">🧾</div><p>Log expenses for at least 3 months<br>to see spending trends and comparisons.</p></div></div>';
+    return;
+  }
 
   // Find longest run of consecutive months with expenses
   let runs=[],cur=[asc[0]];
