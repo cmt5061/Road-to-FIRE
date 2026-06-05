@@ -2140,7 +2140,7 @@ function switchView(name,btn){
   document.getElementById('view-'+name).classList.add('active');
   btn.classList.add('active');
   const fab=document.getElementById('fab');
-  fab.style.display=(name==='dashboard'||name==='history')?'flex':'none';
+  fab.style.display=(name==='history')?'flex':'none';
   if(name==='dashboard')renderDash();
   if(name==='history'){renderHistory();if(historyTab==='trends')renderSpendTrends();if(historyTab==='summaries')renderSummaries();}
   if(name==='achievements')renderAchievements();
