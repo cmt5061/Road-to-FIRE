@@ -1106,11 +1106,14 @@ textarea.full-inp{min-height:75px;resize:none;}
 
   <!-- ── CATEGORY SPEND TRENDS ── -->
   <div class="card" id="cat-trend-card">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-      <div class="card-title">📊 Category Spend Trends</div>
-      <div id="cat-trend-toggles" style="display:flex;flex-wrap:wrap;gap:5px;justify-content:flex-end;"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <div class="card-title">📊 Spend Trends</div>
+      <div style="display:flex;gap:5px;">
+        <button class="ctoggle" id="ctt-total" onclick="setCatTrendMode('total',this)">Total</button>
+        <button class="ctoggle active" id="ctt-category" onclick="setCatTrendMode('category',this)">By Category</button>
+      </div>
     </div>
-    <div style="font-size:11px;color:var(--text3);margin-bottom:10px;">Monthly spend per category over time · tap legend to toggle</div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:10px;" id="cat-trend-sub">Monthly spend per category over time · tap legend to toggle</div>
     <div style="position:relative;">
       <canvas id="cat-trend-chart" height="220"></canvas>
     </div>
@@ -1946,6 +1949,7 @@ const FIRE_TYPES=[
 let chartInst=null;
 let spendChartInst=null;
 let catTrendChartInst=null;
+let catTrendMode='category';
 let chartMode='total';
 let chartRange='all';
 let selectedPoolId=null;
@@ -4138,6 +4142,17 @@ function renderSpendTrends(){
 // ════════════════════════════════════════════════════════
 // THEME
 // ════════════════════════════════════════════════════════
+function setCatTrendMode(mode, btn){
+  catTrendMode=mode;
+  document.querySelectorAll('#ctt-total,#ctt-category').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const sub=document.getElementById('cat-trend-sub');
+  if(sub) sub.textContent=mode==='total'
+    ?'Total monthly spend over time'
+    :'Monthly spend per category over time · tap legend to toggle';
+  renderCatTrendChart();
+}
+
 function renderCatTrendChart(){
   if(typeof Chart==='undefined') return;
   const card=document.getElementById('cat-trend-card');
@@ -4181,24 +4196,42 @@ function renderCatTrendChart(){
     return mo[m.month-1]+' \'' +String(m.year).slice(2);
   });
 
-  const datasets=topCats.map(cat=>{
-    const col=expenseColor(cat);
-    const data=months.map(m=>{
-      const ex=m.expenses.find(e=>e.name===cat);
-      return ex?parseFloat(ex.amount)||0:0;
-    });
-    return{
-      label:cat,
-      data,
-      borderColor:col,
-      backgroundColor:col+'33',
-      borderWidth:2,
+  let datasets;
+  if(catTrendMode==='total'){
+    const totalData=months.map(m=>
+      m.expenses.reduce((s,e)=>s+(parseFloat(e.amount)||0),0)
+    );
+    datasets=[{
+      label:'Total Spend',
+      data:totalData,
+      borderColor:'#c9922a',
+      backgroundColor:'#c9922a33',
+      borderWidth:2.5,
       pointRadius:3,
       pointHoverRadius:5,
       tension:0.35,
-      fill:false,
-    };
-  });
+      fill:true,
+    }];
+  } else {
+    datasets=topCats.map(cat=>{
+      const col=expenseColor(cat);
+      const data=months.map(m=>{
+        const ex=m.expenses.find(e=>e.name===cat);
+        return ex?parseFloat(ex.amount)||0:0;
+      });
+      return{
+        label:cat,
+        data,
+        borderColor:col,
+        backgroundColor:col+'22',
+        borderWidth:2,
+        pointRadius:3,
+        pointHoverRadius:5,
+        tension:0.35,
+        fill:false,
+      };
+    });
+  }
 
   if(catTrendChartInst) catTrendChartInst.destroy();
   catTrendChartInst=new Chart(ctx,{
@@ -4209,7 +4242,7 @@ function renderCatTrendChart(){
       interaction:{mode:'index',intersect:false},
       plugins:{
         legend:{
-          display:true,
+          display:catTrendMode==='category',
           position:'bottom',
           labels:{
             color:'#c8d0dc',
